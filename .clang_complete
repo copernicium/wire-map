@@ -1,0 +1,6 @@
+-Iparser/include/
+-Iinclude/
+-std=c++17
+-pedantic
+-Wextra
+-Wall

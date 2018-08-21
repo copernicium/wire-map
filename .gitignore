@@ -1,3 +1,18 @@
+# Output folders
+lib/*
+bin/*
+
+# CMake Files
+CMakeCache.txt
+CMakeFiles/*
+Makefile
+cmake_install.cmake
+
+# Editor files
+GTAGS
+GPATH
+GRTAGS
+
 # Prerequisites
 *.d
 
@@ -30,3 +45,6 @@
 *.exe
 *.out
 *.app
+
+# Misc
+*.exe.stackdump
