@@ -1,0 +1,32 @@
+Digit as Integer where 0 <= value <= 10           # Specify range of allowed values
+Age as Integer where value >= 0
+Name as List of 8 Character                       # Number followed by type is List of that size
+PhoneNumber as List of 10 Digit
+Person as Collection of Name, PhoneNumber, Age    # Tuple of types
+
+Transform Fun(Integer Coefficient, Integer PulseWidth) -> Integer
+     if Coefficient is 0 then
+          Output 1
+     Output 2
+
+Device RoboRIO
+     Result PWM1
+          Output 5
+
+Device Spark
+     Parameter Integer PulseWidth
+
+     Constant Real Coefficient
+
+     Result Current
+          if PulseWidth < 1000 or PulseWidth > 1000 then
+              Output 0
+          Output Fun(Coefficient, PulseWidth)
+
+RoboRIO roborio
+
+Spark spark1                                      # "spark1" becomes device ID, sparked added to map of objects
+    Coefficient <- 7                              # Assign constant value
+    PulseWidth  <- roborio.PWM1                   # Link PulseWidth Parameter to Result of roborio.PWM1
+
+
