@@ -1,32 +1,77 @@
-Digit as Integer where 0 <= value <= 10           # Specify range of allowed values
-Age as Integer where value >= 0
-Name as List of 8 Character                       # Number followed by type is List of that size
-PhoneNumber as List of 10 Digit
-Person as Collection of Name, PhoneNumber, Age    # Tuple of types
+########## Device definition files
 
-Transform Fun(Integer Coefficient, Integer PulseWidth) -> Integer
-     if Coefficient is 0 then
-          Output 1
-     Output 2
+Digit as Integer where 0 <= value <= 10                          # Specify range of allowed values
+Age as Integer where value >= 0
+Name as List of 8 Character                                      # Number followed by type is List of that size
+PhoneNumber as List of 10 Digit
+Person as Collection of Name, PhoneNumber, Age                   # Tuple of types
+
+Function Integer Fun(Integer Coefficient, Integer PulseWidth)
+    if Coefficient is 0 then
+        Output 1000
+    Output Coefficient * PulseWidth
 
 Device RoboRIO
-     Result PWM1
-          Output 5
+    Result Real PWM1
+        Output 5
 
 Device Spark
-     Parameter Integer PulseWidth
+    Parameter Integer PulseWidth
 
-     Constant Real Coefficient
+    Parameter Real VoltageIn
 
-     Result Current
-          if PulseWidth < 1000 or PulseWidth > 1000 then
-              Output 0
-          Output Fun(Coefficient, PulseWidth)
+    Constant Real Coefficient
+
+    Result Real Current
+        if PulseWidth < 1000 or PulseWidth > 1000 then         # Both if statements with and without parentheses are allowed 
+            Output 0
+        Output Fun(Coefficient, PulseWidth)
+
+Device CIM
+    Parameter Real Current
+
+    Result Load
+
+    Constant Real Coefficient1
+
+    Constant Real Coefficient2
+
+    Result Real Load
+        Output Coefficient1 * Current
+
+    Result Real Torque
+        Output Coefficient2 * Current
+
+Device Battery
+    Parameter List of 2 Real Loads
+
+    Constant Real Coefficient
+
+    Result Real Voltage defaults to 12                           # Specify custom default value for variable
+        Real TotalLoad = 0
+        foreach Elem, Index in Loads do
+            TotalLoad = TotalLoad + Elem
+        Require Output Voltage - Coefficient * TotalLoad         # Variables can be either a value, None, or a default value.
+                                                                 # In cases where a non-None return is required, use "Require" to
+                                                                 # get the default value; otherwise None propagates through
+########## Device tree file
 
 RoboRIO roborio
 
-Spark spark1                                      # "spark1" becomes device ID, sparked added to map of objects
-    Coefficient <- 7                              # Assign constant value
-    PulseWidth  <- roborio.PWM1                   # Link PulseWidth Parameter to Result of roborio.PWM1
+Spark spark1                                                     # "spark1" becomes device ID, sparked added to map of objects
+    VoltageIn <- batt1.Voltage
+    Coefficient = 7                                              # Assign constant value
+    PulseWidth <- roborio.PWM1                                   # Link PulseWidth Parameter to Result of roborio.PWM1
 
+CIM cim1
+    Current <-spark1.Current
+    Coefficient1 = 3
+    Coefficient2 = 5
 
+CIM cim2
+    Current <-spark1.Current
+    Coefficient1 = 3
+    Coefficient2 = 5
+
+Battery batt1
+    Loads <- cim1.Load, cim2.Load

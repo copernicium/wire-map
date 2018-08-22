@@ -1,4 +1,9 @@
 cmake_minimum_required(VERSION 3.0.2)
+
+#IF(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+#  MESSAGE(FATAL_ERROR "Vcpkg toolchain not specified. Please run cmake again with -DCMAKE_TOOLCHAIN_FILE=path/to/vcpkg.cmake")
+#ENDIF()
+
 project(wire-map)
 
 SET(wire-map_VERSION_MAJOR 1)
