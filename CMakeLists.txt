@@ -37,3 +37,11 @@ ADD_LIBRARY(parser SHARED
 TARGET_INCLUDE_DIRECTORIES(parser PRIVATE
   "${CMAKE_BINARY_DIR}/parser/include"
 )
+
+ADD_LIBRARY(wiremap SHARED
+  src/object.cpp
+  )
+
+TARGET_INCLUDE_DIRECTORIES(wiremap PRIVATE
+  "${CMAKE_BINARY_DIR}/include"
+)
