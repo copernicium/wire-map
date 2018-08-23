@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <tuple>
 
 namespace wiremap{
     namespace detail{
@@ -33,33 +34,37 @@ namespace wiremap{
         };
     }
 
-    template<typename T, typename S, S DefaultValue>
+    template<typename T, auto DefaultValue>
     struct Object: public detail::MaybeObject<T>{
+        private:
+        using DefaultValueType = decltype(DefaultValue);
+
+        public:
         T default_value;
 
         Object(T v, T default_v)noexcept: detail::MaybeObject<T>(v){
-            static_assert(std::is_convertible_v<T,S>, "Default value different than value type");
+            static_assert(std::is_convertible_v<T,DefaultValueType>, "Default value different than value type");
             default_value = default_v;
         }
         Object(T v)noexcept: detail::MaybeObject<T>(v){
-            static_assert(std::is_convertible_v<T,S>, "Default value different than value type");
+            static_assert(std::is_convertible_v<T,DefaultValueType>, "Default value different than value type");
             default_value = DefaultValue;
         }
         Object()noexcept: detail::MaybeObject<T>(){
-            static_assert(std::is_convertible_v<T,S>, "Default value different than value type");
+            static_assert(std::is_convertible_v<T,DefaultValueType>, "Default value different than value type");
             default_value = DefaultValue;
         }
     };
 
     template<typename T>
-    struct Integral: public Object<T, int, 0> {
-        Integral(T v, T default_v)noexcept: Object<T,int,0>(v, default_v){
+    struct Integral: public Object<T, 0> {
+        Integral(T v, T default_v)noexcept: Object<T,0>(v, default_v){
             static_assert(std::is_integral_v<T>, "Integral defined with non-integral type");
         }
-        Integral(T v)noexcept: Object<T,int,0>(v){
+        Integral(T v)noexcept: Object<T,0>(v){
             static_assert(std::is_integral_v<T>, "Integral defined with non-integral type");
         }
-        Integral()noexcept: Object<T,int,0>(){
+        Integral()noexcept: Object<T,0>(){
             static_assert(std::is_integral_v<T>, "Integral defined with non-integral type");
         }
     };
@@ -72,8 +77,8 @@ namespace wiremap{
     using QWord = Integral<uint64_t>;
     using Integer = Integral<long>;
 
-    using Bool = Object<bool, bool, false>;
-    using Real = Object<double, int, 0>;
+    using Bool = Object<bool, false>;
+    using Real = Object<double, 0>;
 
     template<typename T, std::size_t Size>
     using List = detail::Container<std::array<T, Size>, Size, std::is_base_of_v<detail::ObjectBase, T>>;
