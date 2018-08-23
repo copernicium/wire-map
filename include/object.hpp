@@ -3,6 +3,7 @@
 #include <array>
 #include <optional>
 #include <type_traits>
+#include <tuple>
 
 namespace wiremap{
 
@@ -89,7 +90,7 @@ namespace wiremap{
     struct IntegralImpl {
     private:
         IntegralImpl()noexcept {
-            static_assert(std::is_integral_v<T>, "Integral defined with non-integral type");
+           static_assert(std::is_integral_v<T>, "Integral defined with non-integral type");
         }
     };
 
