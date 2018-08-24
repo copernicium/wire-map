@@ -4,6 +4,21 @@
 #include "util.hpp"
 
 namespace wiremap{
+    namespace attributes{
+        template<typename T, typename... AttributeChecks>
+        struct Attribute{
+            static void verify(T){}
+        };
+
+        template<typename T, typename First, typename... AttributeChecks>
+        struct Attribute<T, First, AttributeChecks...>{
+            static void verify(T v){
+                First::verify(v);
+                Attribute<T, AttributeChecks...>::verify(v);
+            }
+        };
+    }
+
     namespace detail{
         struct ObjectBase{};
 
@@ -22,7 +37,7 @@ namespace wiremap{
             }
         };
 
-        template<typename T, auto DefaultValue, typename... Attributes>
+        template<typename T, auto DefaultValue,  typename... Attributes>
         struct Object: public ObjectBase, public Attributes...{
             static_assert(!detail::is_specialization_of<T, detail::Container>::value, "Objects are not allowed to be of type detail::Container");
             static_assert(std::is_convertible_v<decltype(DefaultValue),T>, "Default value different than value type");
@@ -35,8 +50,15 @@ namespace wiremap{
             bool valid;
 
         public:
-            Object(T v, T default_v)noexcept: value(v), default_value(default_v),valid(true){}
-            Object(T v)noexcept: Object(v, DefaultValue){}
+            Object(T v, T default_v)noexcept: value(v), default_value(default_v),valid(true){
+                attributes::Attribute<T,Attributes...>::verify(v);
+                attributes::Attribute<T,Attributes...>::verify(default_v);
+            }
+
+            Object(T v)noexcept: Object(v, DefaultValue){
+                attributes::Attribute<T,Attributes...>::verify(v);
+            }
+
             Object()noexcept: default_value(DefaultValue),valid(false){}
 
             constexpr const T& getDefault()const noexcept{
@@ -70,14 +92,24 @@ namespace wiremap{
         template<typename T>
         struct is_object_specialization: public std::false_type{};
 
-        template<typename T, auto D, typename... Args>
-        struct is_object_specialization<Object<T, D, Args...>>: public std::true_type{};
+        template<typename T, auto D, typename... Attributes>
+        struct is_object_specialization<Object<T, D, Attributes...>>: public std::true_type{};
     }
 
     namespace attributes{
         template<typename T>
         struct Integral{
             static_assert(std::is_integral_v<T>, "Integral defined with non-integral type");
+            static constexpr void verify(T)noexcept{}
+        };
+
+        template<typename T,auto DefaultValue, decltype(DefaultValue) Begin, decltype(DefaultValue) End>
+        struct InRange{
+            static_assert(Begin <= DefaultValue && DefaultValue <= End);
+
+            static constexpr void verify(T value)noexcept{
+                assert(Begin <= value && value <= End); //TODO invalidate data instead? throw?
+            }
         };
     }
 

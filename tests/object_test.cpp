@@ -18,6 +18,12 @@ TEST(ObjectTest, Constructor){
     EXPECT_EQ((bool)b, true);
 }
 
+TEST(ObjectTest, AttributeTest){
+    using Ranged = detail::Object<int, 0, attributes::Integral<int>, attributes::InRange<int,0,0,10>>; //TODO reduce redundancy in attribute list
+    Ranged r = 6;
+    EXPECT_EQ(r.get(), 6);
+}
+
 TEST(ContainerTest, Constructor){
     List<Integer, 4> ints;
     EXPECT_EQ(ints.size(),4);
