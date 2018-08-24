@@ -4,11 +4,11 @@
 using namespace wiremap;
 
 TEST(ObjectTest, Constructor){
-    Object<int,0> a;
+    Integer a;
     EXPECT_EQ(a.default_value, 0);
     EXPECT_EQ(a.valid, false);
 
-    Object<double,0> b = 6;
+    Real b = 6;
     EXPECT_EQ(b.default_value, 0);
     EXPECT_EQ(b.value, 6);
     EXPECT_EQ(b.valid, true);
@@ -16,6 +16,9 @@ TEST(ObjectTest, Constructor){
 
 TEST(ContainerTest, Constructor){
     List<Integer, 4> ints;
+    EXPECT_EQ(ints.size,4);
     Collection<Integer, Real> t;
-    EXPECT_EQ(0,0); //as long as this compiles it passes
+    EXPECT_EQ(t.size,2);
+    Collection<Collection<Char, Integer>, List<Byte,5>> complex;
+    EXPECT_EQ(complex.size,2);
 }

@@ -10,106 +10,116 @@ namespace wiremap{
     struct None{};
 
     namespace detail{
+        template<typename T, template <typename...> typename Template>
+        struct is_specialization_of: public std::false_type{};
 
-        template<typename T, template <typename...> class Template>
-        struct is_specialization_of{
-            using value = std::false_type;
-        };
-
-        template<template <typename...> class Template, typename ... Args>
-        struct is_specialization_of<Template<Args...>, Template> {
-            using value = std::true_type;
-        };
-
-        template<typename T, class ... Attributes>
-        struct ObjectBase {
-            using value_type = T;
-
-            T value;
-            bool valid;
-
-            ObjectBase(T v)noexcept: value(v), valid(true){}
-            ObjectBase()noexcept: valid(false){}
-        };
+        template<template <typename...> typename Template, typename... Args>
+        struct is_specialization_of<Template<Args...>, Template>: public std::true_type{};
 
         template<typename T>
-        struct Container: public detail::ObjectBase<T>{
+        struct is_std_array: public std::false_type{};
+
+        template<typename T, std::size_t Size>
+        struct is_std_array<std::array<T, Size>>: public std::true_type{};
+
+        template<typename T>
+        inline constexpr bool is_std_array_v = is_std_array<T>::value;
+
+        template <bool AllDerivedTypes, typename... T>
+        struct check_tuple;
+
+        template<>
+        struct check_tuple<true>: std::true_type{};
+
+        template<>
+        struct check_tuple<false>: std::false_type{};
+
+        template<bool AllDerivedTypes, typename Base, typename First>
+        struct check_tuple<AllDerivedTypes, Base, First>: check_tuple<AllDerivedTypes && std::is_base_of_v<Base, First>>{};
+
+        template<bool AllDerivedTypes, typename Base, typename First, typename... Rest>
+        struct check_tuple<AllDerivedTypes, Base, First, Rest...>: check_tuple<AllDerivedTypes && std::is_base_of_v<Base, First>, Base, Rest...>{};
+
+        template<typename Base, typename... Ts>
+        struct check_tuple_types;
+
+        template<typename Base, typename... Ts>
+        struct check_tuple_types<Base, std::tuple<Ts...>> : check_tuple<true, Base, Ts...>{};
+
+        template<typename T>
+        struct array_size;
+
+        template<typename T, std::size_t Size>
+        struct array_size< std::array<T, Size>>: public std::integral_constant<std::size_t, Size>{};
+
+        template<typename T>
+        inline constexpr std::size_t array_size_v = array_size<T>::value;
+
+        struct ObjectBase{};
+
+        template<typename T>
+        struct Container: public detail::ObjectBase{
+            T internal;
             std::size_t size;
 
-            template<std::enable_if_t<std::is_base_of_v<std::tuple, T>>>
-            Container(T v)noexcept: detail::ObjectBase<T>(v){
-                using TupleTypes = typename T::Types;
-                static_assert(std::conjunction_v<is_specialization_of<TupleTypes, ObjectBase>>, "Container value type not derived from detail::ObjectBase");
-                size = std::tuple_size(v);
+            Container()noexcept{
+                if constexpr (is_specialization_of<T, std::tuple>::value){
+                    static_assert(check_tuple_types<ObjectBase, T>::value, "Container value type not derived from detail::ObjectBase");
+                    size = std::tuple_size_v<T>;
+                } else if(is_std_array_v<T>){
+                    static_assert(std::is_base_of_v<ObjectBase, typename T::value_type>, "Container value type not derived from detail::ObjectBase");
+                    size = array_size_v<T>;
+                }
             }
 
-            template<std::enable_if_t<std::is_base_of_v<std::array, T>>>
-            Container(T v)noexcept: detail::ObjectBase<T>(v){
-                static_assert(std::is_base_of_v<ObjectBase<T>, T::value_type>, "Container value type not derived from detail::ObjectBase");
-                size = v.size();
-            }
-
-            Container()noexcept: detail::ObjectBase<T>(){
-                static_assert(std::is_base_of_v<ObjectBase<T>, T>, "Container value type not derived from detail::ObjectBase");
-                size = 0;
+            Container(T v)noexcept:Container(){
+                internal = v;
             }
         };
     }
 
-    template<typename T, auto DefaultValue = None{}, class ... Attributes>
-    struct Object: public detail::ObjectBase<T, Attributes...>{
-        using S = decltype(DefaultValue);
-        std::optional<T> default_value = DefaultValue;
-        template<std::enable_if_t<std::is_base_of_v<std::tuple, T>>>
-        Object(T v)noexcept: detail::ObjectBase<T>(v){
-            using TupleTypes = typename T::Types;
-            static_assert(std::conjunction_v<detail::is_specialization_of<TupleTypes, detail::ObjectBase>>, "Object value type not derived from detail::ObjectBase");
-        }
+    template<typename T, auto DefaultValue>
+    struct Object: public detail::ObjectBase{
+    protected:
+        static_assert(!detail::is_specialization_of<T, detail::Container>::value, "Objects are not allowed to be of type detail::Container");
+        static_assert(std::is_convertible_v<T,decltype(DefaultValue)>, "Default value different than value type");
 
-        template<std::enable_if_t<std::is_base_of_v<std::array, T>>>
-        Object(T v)noexcept: detail::ObjectBase<T>(v){
-            static_assert(std::is_base_of_v<detail::ObjectBase<T>, T::value_type>, "Object value type not derived from detail::ObjectBase");
-        }
+    public:
+        using value_type = T;
 
-        Object(T v, T default_v)noexcept: detail::ObjectBase<T>(v){
-            static_assert(std::is_convertible_v<T,S>, "Default value different than value type");
-            default_value = default_v;
-        }
-        Object(T v)noexcept: detail::ObjectBase<T>(v){
-            static_assert(std::is_convertible_v<T,S>, "Default value different than value type");
-            default_value = DefaultValue;
-        }
-        Object()noexcept: detail::ObjectBase<T>(){
-            static_assert(std::is_convertible_v<T,S>, "Default value different than value type");
-            default_value = DefaultValue;
-        }
+        T value;
+        T default_value;
+        bool valid;
+
+        Object(T v, T default_v)noexcept: value(v), default_value(default_v),valid(true){}
+        Object(T v)noexcept: Object(v, DefaultValue){}
+        Object()noexcept: default_value(DefaultValue),valid(false){}
     };
-
 
     template<typename T>
-    struct IntegralImpl {
-    private:
-        IntegralImpl()noexcept {
-           static_assert(std::is_integral_v<T>, "Integral defined with non-integral type");
-        }
+    struct Integral: public Object<T, 0>{ //TODO look into integrating as attributes
+    protected:
+        static_assert(std::is_integral_v<T>, "Integral defined with non-integral type");
+
+    public:
+        Integral(T v)noexcept: Object<T, 0>(v){}
+        Integral()noexcept: Object<T, 0>(){}
     };
 
-    template<typename T, auto DefaultValue>
-    using Integral = Object<T, DefaultValue, IntegralImpl<T>>;
-    using Bit = Integral<bool,  0>;
-    using Char = Integral<char, 0>;
-    using Byte = Integral<uint8_t, 0>;
-    using Word = Integral<uint16_t, 0>;
-    using DWord = Integral<uint32_t, 0>;
-    using QWord = Integral<uint64_t, 0>;
-    using Integer = Integral<long, 0>;
+    using Bit = Integral<bool>;
+    using Char = Integral<char>;
+    using Byte = Integral<uint8_t>;
+    using Word = Integral<uint16_t>;
+    using DWord = Integral<uint32_t>;
+    using QWord = Integral<uint64_t>;
+    using Integer = Integral<long>;
 
     using Bool = Object<bool, false>;
     using Real = Object<double, 0>;
 
     template<typename T, std::size_t Size>
-    using List = Object<std::array<T, Size>, 0>;
+    using List = detail::Container<std::array<T, Size>>;
 
-    template<typename ...T>
-    using Collection = Object<std::tuple<T...>, 0>;
+    template<typename... Ts>
+    using Collection = detail::Container<std::tuple<Ts...>>;
 }
