@@ -13,13 +13,13 @@ namespace wiremap{
         struct is_specialization_of<Template<Args...>, Template>: public std::true_type{};
 
         template<typename T>
-        struct is_std_array: public std::false_type{};
+        struct is_array_specialization: public std::false_type{};
 
         template<typename T, std::size_t Size>
-        struct is_std_array<std::array<T, Size>>: public std::true_type{};
+        struct is_array_specialization<std::array<T, Size>>: public std::true_type{};
 
         template<typename T>
-        inline constexpr bool is_std_array_v = is_std_array<T>::value;
+        inline constexpr bool is_array_specialization_v = is_array_specialization<T>::value;
 
         template <bool AllDerivedTypes, typename... T>
         struct check_tuple;
