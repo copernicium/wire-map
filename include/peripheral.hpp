@@ -1,5 +1,5 @@
 #pragma once
 
 namespace wiremap{
-    struct Peripheral{};
+    struct Peripheral{}; //TODO
 }

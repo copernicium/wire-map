@@ -12,8 +12,8 @@ namespace wiremap{
     struct Result: public detail::ResultBase{
         static_assert(detail::is_wiremap_object_v<T>,"Constant built from type not derived from detail::ObjectBase");
     protected:
-        KeyType source_device_hash;
-        std::shared_ptr<google::dense_hash_map<KeyType,KeyType,Hasher,KeyCompare>> source_parameter_hashes;
+        detail::KeyType source_device_hash;
+        std::shared_ptr<google::dense_hash_map<detail::KeyType,detail::KeyType,detail::Hasher,detail::KeyCompare>> source_parameter_hashes;
         unsigned update_count;
         std::shared_ptr<T> cache;
         Function update_function;
@@ -21,7 +21,7 @@ namespace wiremap{
     public:
         const std::shared_ptr<T>& get(){
             bool update = false;
-            for(const std::pair<KeyType, KeyType>& source_parameter: *source_parameter_hashes){
+            for(const std::pair<detail::KeyType, detail::KeyType>& source_parameter: *source_parameter_hashes){
                 //TODO check if results parameters point to have been updated
             }
             if(update){
@@ -32,7 +32,7 @@ namespace wiremap{
             return cache;
         }
 
-        Result(const KeyType& d_hash, const T& v): source_device_hash(d_hash), source_parameter_hashes(std::make_shared<google::dense_hash_map<KeyType,KeyType,Hasher,KeyCompare>>()), update_count(0), cache(std::make_shared<T>(v)){
+        Result(const detail::KeyType& d_hash, const T& v): source_device_hash(d_hash), source_parameter_hashes(std::make_shared<google::dense_hash_map<detail::KeyType,detail::KeyType,detail::Hasher,detail::KeyCompare>>()), update_count(0), cache(std::make_shared<T>(v)){
             source_parameter_hashes->set_empty_key(0);
         } //TODO no result constructor should take a T--use update instead
 
