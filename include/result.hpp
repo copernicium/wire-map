@@ -2,27 +2,39 @@
 
 #include <memory>
 #include "device_bases.hpp"
+#include "function.hpp"
+#include "map.hpp"
 #include "object.hpp"
+#include "wiremap.hpp"
 
 namespace wiremap{
     template<typename T>
-    struct Result: public ResultBase{
+    struct Result: public detail::ResultBase{
         static_assert(detail::is_wiremap_object_v<T>,"Constant built from type not derived from detail::ObjectBase");
     protected:
+        KeyType source_device_hash;
+        std::shared_ptr<google::dense_hash_map<KeyType,KeyType,Hasher,KeyCompare>> source_parameter_hashes;
         unsigned update_count;
         std::shared_ptr<T> cache;
+        Function update_function;
 
     public:
-        const std::shared_ptr<T>& get()const{
+        const std::shared_ptr<T>& get(){
+            bool update = false;
+            for(const std::pair<KeyType, KeyType>& source_parameter: *source_parameter_hashes){
+                //TODO check if results parameters point to have been updated
+            }
+            if(update){
+                update_count++;
+                //update_function
+                // return WireMap::get(source_device_hash).getParameter(source_parameter_hashes);
+            }
             return cache;
         }
 
-        void update()noexcept{
-            update_count++;
-            //TODO
-        }
-
-        Result(T v): update_count(0), cache(std::make_shared<T>(v)){} //TODO no result constructor should take a T--use update instead
+        Result(const KeyType& d_hash, const T& v): source_device_hash(d_hash), source_parameter_hashes(std::make_shared<google::dense_hash_map<KeyType,KeyType,Hasher,KeyCompare>>()), update_count(0), cache(std::make_shared<T>(v)){
+            source_parameter_hashes->set_empty_key(0);
+        } //TODO no result constructor should take a T--use update instead
 
         Result() = delete;
 

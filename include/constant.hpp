@@ -1,11 +1,12 @@
 #pragma once
 
 #include "collection.hpp"
+#include "device_bases.hpp"
 #include "list.hpp"
 
 namespace wiremap{
     template<typename T>
-    struct Constant: detail::ObjectBase{
+    struct Constant: public detail::ObjectBase, public detail::ConstantBase{
         static_assert(detail::is_wiremap_object_v<T>,"Constant built from type not derived from detail::ObjectBase");
 
     protected:
