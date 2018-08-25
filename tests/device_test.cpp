@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "constant.hpp"
+#include "types.hpp"
 #include "accessors.hpp"
 
 using namespace wiremap;
@@ -14,11 +14,11 @@ TEST(DeviceTest, ParameterTest){
     Parameter<Integer> p = {hashstr("spark1"), hashstr("current")};
     Result<Integer> r2 = getResult(p);
 
-    printf("value:%ld \n",r2.get()->require());
     EXPECT_EQ(r2,r);
+    EXPECT_EQ(r2.get()->require(),5);
 }
 
 TEST(DeviceTest, Constructor){
     Device a;
-    EXPECT_EQ(0,0); //TODO
+    //Fine as long as it compiles
 }

@@ -43,11 +43,16 @@ namespace wiremap{
     };
 
     template<typename T1, typename T2>
+    bool deepCompare(const Result<T1>& A, const Result<T2>& B){
+        if(A == B){
+            return true;
+        }
+        return A.update_count == B.update_count;
+    }
+
+    template<typename T1, typename T2>
     bool operator==(const Result<T1>& A, const Result<T2>& B){
         if(!std::is_same_v<T1,T2>){
-            return false;
-        }
-        if(A.update_count != B.update_count){ //TODO compare this?
             return false;
         }
         if((A.cache == nullptr) != (B.cache == nullptr)){

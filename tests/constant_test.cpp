@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "constant.hpp"
+#include "types.hpp"
 
 using namespace wiremap;
 

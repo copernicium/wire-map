@@ -1,18 +1,19 @@
 #pragma once
 
 #include <cassert>
+#include <iostream>
 #include "util.hpp"
 
 namespace wiremap{
     namespace attributes{
         template<typename T, typename... AttributeChecks>
         struct Attribute{
-            static void verify(const T&){}
+            static void verify(T&){}
         };
 
         template<typename T, typename First, typename... AttributeChecks>
         struct Attribute<T, First, AttributeChecks...>{
-            static void verify(const T& v){
+            static void verify(T& v){
                 First::verify(v);
                 Attribute<T, AttributeChecks...>::verify(v);
             }
@@ -53,12 +54,12 @@ namespace wiremap{
 
         public:
             Object(const T& v, const T& default_v)noexcept: value(v), default_value(default_v),valid(true){
-                attributes::Attribute<T,Attributes...>::verify(v);
-                attributes::Attribute<T,Attributes...>::verify(default_v);
+                attributes::Attribute<T,Attributes...>::verify(value);
+                attributes::Attribute<T,Attributes...>::verify(default_value);
             }
 
             Object(const T& v)noexcept: Object(v, DefaultValue){
-                attributes::Attribute<T,Attributes...>::verify(v);
+                attributes::Attribute<T,Attributes...>::verify(value);
             }
 
             Object()noexcept: default_value(DefaultValue),valid(false){}
@@ -88,20 +89,59 @@ namespace wiremap{
                 return valid;
             }
 
-            template<typename CompT, auto CompDefaultValue, typename... CompAttributes>
-            bool operator==(const Object<CompT,CompDefaultValue,CompAttributes...>& B){
-                if(!std::is_same_v<T,CompT>){
-                    return false;
+            Object<T, DefaultValue, Attributes...>& operator+=(const Object<T, DefaultValue, Attributes...>& B){
+                assert(default_value == B.default_value);
+                if(!valid || !B.valid){
+                    valid = false;
+                    return *this;
                 }
-                if(!std::is_same_v<decltype(DefaultValue),decltype(CompDefaultValue)>){
-                    return false;
+                value = value + B.value;
+                return *this;
+            }
+
+            template<typename OpT, auto OpDefaultValue, typename... OpAttributes>
+                friend Object<OpT, OpDefaultValue, OpAttributes...> operator+(Object<OpT, OpDefaultValue, OpAttributes...>, const Object<OpT, OpDefaultValue, OpAttributes...>&);
+
+            Object<T, DefaultValue, Attributes...>& operator-=(const Object<T, DefaultValue, Attributes...>& B){
+                assert(default_value == B.default_value);
+                if(!valid || !B.valid){
+                    valid = false;
+                    return *this;
                 }
-                if(DefaultValue != CompDefaultValue){
-                    return false;
+                value = value - B.value;
+                return *this;
+            }
+
+            template<typename OpT, auto OpDefaultValue, typename... OpAttributes>
+                friend Object<OpT, OpDefaultValue, OpAttributes...> operator*(Object<OpT, OpDefaultValue, OpAttributes...>, const Object<OpT, OpDefaultValue, OpAttributes...>&);
+
+            Object<T, DefaultValue, Attributes...>& operator*=(const Object<T, DefaultValue, Attributes...>& B){
+                assert(default_value == B.default_value);
+                if(!valid || !B.valid){
+                    valid = false;
+                    return *this;
                 }
-                if(!std::conjunction_v<std::is_same<Attributes,CompAttributes>...>){
-                    return false;
+                value = value * B.value;
+                return *this;
+            }
+
+            template<typename OpT, auto OpDefaultValue, typename... OpAttributes>
+                friend Object<OpT, OpDefaultValue, OpAttributes...> operator/(Object<OpT, OpDefaultValue, OpAttributes...>, const Object<OpT, OpDefaultValue, OpAttributes...>&);
+
+            Object<T, DefaultValue, Attributes...>& operator/=(const Object<T, DefaultValue, Attributes...>& B){
+                assert(default_value == B.default_value);
+                if(!valid || !B.valid){
+                    valid = false;
+                    return *this;
                 }
+                value = value / B.value;
+                return *this;
+            }
+
+            template<typename OpT, auto OpDefaultValue, typename... OpAttributes>
+            friend Object<OpT, OpDefaultValue, OpAttributes...> operator-(Object<OpT, OpDefaultValue, OpAttributes...>, const Object<OpT, OpDefaultValue, OpAttributes...>&);
+
+            bool operator==(const Object<T,DefaultValue,Attributes...>& B){
                 if(default_value != B.default_value){
                     return false;
                 }
@@ -113,10 +153,56 @@ namespace wiremap{
                 }
                 return true;
             }
-        };
-    }
 
-    namespace detail{
+            bool operator!=(const Object<T,DefaultValue,Attributes...>& B){
+                return !(*this == B);
+            }
+        };
+
+        template<typename T, auto DefaultValue, typename... Attributes>
+        Object<T, DefaultValue, Attributes...> operator+(Object<T, DefaultValue, Attributes...> a, const Object<T, DefaultValue, Attributes...>& B){
+            assert(a.default_value == B.default_value);
+            if(!a.valid || !B.valid){
+                a.valid = false;
+                return a;
+            }
+            a.value = a.value + B.value;
+            return a;
+        }
+
+        template<typename T, auto DefaultValue, typename... Attributes>
+        Object<T, DefaultValue, Attributes...> operator-(Object<T, DefaultValue, Attributes...> a, const Object<T, DefaultValue, Attributes...>& B){
+            assert(a.default_value == B.default_value);
+            if(!a.valid || !B.valid){
+                a.valid = false;
+                return a;
+            }
+            a.value = a.value - B.value;
+            return a;
+        }
+
+        template<typename T, auto DefaultValue, typename... Attributes>
+        Object<T, DefaultValue, Attributes...> operator*(Object<T, DefaultValue, Attributes...> a, const Object<T, DefaultValue, Attributes...>& B){
+            assert(a.default_value == B.default_value);
+            if(!a.valid || !B.valid){
+                a.valid = false;
+                return a;
+            }
+            a.value = a.value * B.value;
+            return a;
+        }
+
+        template<typename T, auto DefaultValue, typename... Attributes>
+        Object<T, DefaultValue, Attributes...> operator/(Object<T, DefaultValue, Attributes...> a, const Object<T, DefaultValue, Attributes...>& B){
+            assert(a.default_value == B.default_value);
+            if(!a.valid || !B.valid){
+                a.valid = false;
+                return a;
+            }
+            a.value = a.value / B.value;
+            return a;
+        }
+
         template<typename T>
         struct is_object_specialization: public std::false_type{};
 
@@ -128,30 +214,23 @@ namespace wiremap{
         template<typename T>
         struct Integral{
             static_assert(std::is_integral_v<T>, "Integral defined with non-integral type");
-            static constexpr void verify(const T&)noexcept{}
+            static constexpr void verify(T&)noexcept{}
         };
 
-        template<typename T,auto DefaultValue, decltype(DefaultValue) Begin, decltype(DefaultValue) End>
+        template<typename T,auto DefaultValue, decltype(DefaultValue) Min, decltype(DefaultValue) Max>
         struct InRange{
-            static_assert(Begin <= DefaultValue && DefaultValue <= End);
+            static_assert(Min <= Max);
+            static_assert(Min <= DefaultValue && DefaultValue <= Max);
 
-            static constexpr void verify(const T& value)noexcept{
-                assert(Begin <= value && value <= End); //TODO invalidate data instead? throw?
+            static constexpr void verify(T& value)noexcept{
+                if(value < Min){
+                    std::cerr<<"Verification of object with attribute InRange [Min = "<<Min<<" and Max = "<<Max<<"] failed. Value was set to out of range value "<<value<<"; clipped to "<<Min<<"\n";
+                    value = Min;
+                } else if(value > Max){
+                    std::cerr<<"Verification of object with attribute InRange [Min = "<<Min<<" and Max = "<<Max<<"] failed. Value was set to out of range value "<<value<<"; clipped to "<<Max<<"\n";
+                    value = Max;
+                }
             }
         };
     }
-
-    template<typename T>
-    using Integral = detail::Object<T, 0, attributes::Integral<T>>;
-
-    using Bit = Integral<bool>;
-    using Char = Integral<char>;
-    using Byte = Integral<uint8_t>;
-    using Word = Integral<uint16_t>;
-    using DWord = Integral<uint32_t>;
-    using QWord = Integral<uint64_t>;
-    using Integer = Integral<long>;
-
-    using Bool = detail::Object<bool, false>;
-    using Real = detail::Object<double, 0>;
 }

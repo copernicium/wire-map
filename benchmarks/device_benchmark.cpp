@@ -1,6 +1,6 @@
 #include <benchmark/benchmark.h>
 
-#include "constant.hpp"
+#include "types.hpp"
 #include "accessors.hpp"
 
 using namespace wiremap;
