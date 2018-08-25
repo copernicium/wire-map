@@ -20,7 +20,9 @@ namespace wiremap{
     }
 
     namespace detail{
-        struct ObjectBase{};
+        struct ObjectBase{
+            virtual ~ObjectBase() = default;
+        };
 
         template<typename T>
         inline constexpr bool is_wiremap_object_v = std::is_base_of_v<detail::ObjectBase,T>;
@@ -84,6 +86,23 @@ namespace wiremap{
 
             constexpr operator bool()const noexcept{
                 return valid;
+            }
+
+            template<typename CompT, auto CompDefaultValue, typename... CompAttributes>
+                bool operator==(const Object<CompT,CompDefaultValue,CompAttributes...>& B){
+                if(!std::is_same_v<decltype(*this),decltype(B)>){
+                    return false;
+                }
+                if(default_value != B.default_value){
+                    return false;
+                }
+                if(valid != B.valid){
+                    return false;
+                }
+                if(valid && value != B.value){
+                    return false;
+                }
+                return true;
             }
         };
     }
