@@ -89,8 +89,17 @@ namespace wiremap{
             }
 
             template<typename CompT, auto CompDefaultValue, typename... CompAttributes>
-                bool operator==(const Object<CompT,CompDefaultValue,CompAttributes...>& B){
-                if(!std::is_same_v<decltype(*this),decltype(B)>){
+            bool operator==(const Object<CompT,CompDefaultValue,CompAttributes...>& B){
+                if(!std::is_same_v<T,CompT>){
+                    return false;
+                }
+                if(!std::is_same_v<decltype(DefaultValue),decltype(CompDefaultValue)>){
+                    return false;
+                }
+                if(DefaultValue != CompDefaultValue){
+                    return false;
+                }
+                if(!std::conjunction_v<std::is_same<Attributes,CompAttributes>...>){
                     return false;
                 }
                 if(default_value != B.default_value){

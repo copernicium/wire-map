@@ -11,7 +11,7 @@ namespace wiremap{
         std::shared_ptr<google::dense_hash_map<KeyType,std::shared_ptr<ResultBase>,Hasher,KeyCompare>> results;
 
     public:
-        std::shared_ptr<ResultBase>& getResult(std::size_t r_hash)const noexcept{
+        std::shared_ptr<ResultBase>& getResult(std::size_t r_hash)const noexcept{ //TODO should return const once constructor is capable of defining results
             return (*results)[r_hash];
         }
 

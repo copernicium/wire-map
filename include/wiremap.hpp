@@ -5,8 +5,6 @@
 namespace wiremap{
     struct WireMap{
     private:
-        // static_assert(Hasher(576) == 576);//TODO
-
         static std::shared_ptr<google::dense_hash_map<KeyType,Device,Hasher,KeyCompare>> devices;
 
     public:

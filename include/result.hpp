@@ -17,7 +17,12 @@ namespace wiremap{
             return cache;
         }
 
-        Result(T v): update_count(0), cache(std::make_shared<T>(v)){}
+        void update()noexcept{
+            update_count++;
+            //TODO
+        }
+
+        Result(T v): update_count(0), cache(std::make_shared<T>(v)){} //TODO no result constructor should take a T--use update instead
 
         Result() = delete;
 
@@ -33,8 +38,11 @@ namespace wiremap{
         if(A.update_count != B.update_count){ //TODO compare this?
             return false;
         }
-        if(A.cache != B.cache){ //TODO compare values not ptrs
+        if((A.cache == nullptr) != (B.cache == nullptr)){
             return false;
+        }
+        if(A.cache != nullptr){
+            return (*A.cache) == (*B.cache);
         }
         return true;
     }
