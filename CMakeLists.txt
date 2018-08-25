@@ -4,7 +4,7 @@ IF(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
   MESSAGE(FATAL_ERROR "Vcpkg toolchain not specified. Please run cmake again with -DCMAKE_TOOLCHAIN_FILE=path/to/vcpkg.cmake")
 ENDIF()
 
-project(wire-map)
+PROJECT(wire-map)
 
 SET(wire-map_VERSION_MAJOR 1)
 SET(wire-map_VERSION_MINOR 0)
@@ -21,14 +21,14 @@ SET(CMAKE_CXX_COMPILER g++)
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra -std=c++17")
 
-if(BUILD_TYPE MATCHES "^[Rr][Ee][Ll][Ee][Aa][Ss][Ee]")
+IF(BUILD_TYPE MATCHES "^[Rr][Ee][Ll][Ee][Aa][Ss][Ee]")
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Werror")
-else()
-  if(NOT BUILD_TYPE MATCHES "^[Dd][Ee][Bb][Uu][Gg]")
+ELSE()
+  IF(NOT BUILD_TYPE MATCHES "^[Dd][Ee][Bb][Uu][Gg]")
     MESSAGE(WARNING "No build type specified; defaulting to debug.")
-  endif()
+  ENDIF()
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g")
-endif()
+ENDIF()
 
 ADD_LIBRARY(parser SHARED
   parser/src/parser.cpp)
@@ -42,8 +42,8 @@ ADD_LIBRARY(wiremap SHARED
 TARGET_INCLUDE_DIRECTORIES(wiremap PRIVATE
   "${CMAKE_BINARY_DIR}/include")
 
-if(TESTING MATCHES "[Tt][Rr][Uu][Ee]" OR TESTING MATCHES "[Oo][Nn]")
-  FIND_PATH(GTEST_INCLUDE_DIR gtest/gtest.h)
+IF(TESTING MATCHES "[Tt][Rr][Uu][Ee]" OR TESTING MATCHES "[Oo][Nn]")
+  FIND_PATH(GTEST_INCLUDE_DIR gtest/gtest.h) #vcpkg install gtest
   FIND_LIBRARY(GTEST_LIBRARY gtest)
 
   MESSAGE("Disovering test files:")
@@ -63,7 +63,35 @@ if(TESTING MATCHES "[Tt][Rr][Uu][Ee]" OR TESTING MATCHES "[Oo][Nn]")
       "${CMAKE_BINARY_DIR}/include")
     SET_TARGET_PROPERTIES(${test_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests")
   ENDFOREACH(file test_list)
-else()
+ELSE()
   MESSAGE(STATUS "Skipped generation of unit tests.")
-endif()
+ENDIF()
+
+IF(BENCHMARK MATCHES "[Tt][Rr][Uu][Ee]" OR BENCHMARK MATCHES "[Oo][Nn]")
+  FIND_PATH(GTEST_INCLUDE_DIR gtest/gtest.h) #vcpkg install gtest
+  FIND_LIBRARY(GTEST_LIBRARY gtest)
+  FIND_PATH(BENCHMARK_INCLUDE_DIR benchmark/benchmark.h) #vcpkg install benchmark
+  FIND_LIBRARY(BENCHMARK_LIBRARY benchmark)
+
+  MESSAGE("Discovering benchmark files:")
+
+  FILE(GLOB benchmark_list benchmarks/*.cpp)
+  FOREACH(file ${benchmark_list})
+    STRING(REPLACE ".cpp" "" benchmark_name_unclean ${file})
+    GET_FILENAME_COMPONENT(benchmark_name ${benchmark_name_unclean} NAME)
+    MESSAGE("Benchmark \"${benchmark_name}\" found. Generating build target.")
+
+    ADD_EXECUTABLE(${benchmark_name} ${file})
+
+    TARGET_LINK_LIBRARIES(${benchmark_name} wiremap pthread ${BENCHMARK_LIBRARY} ${GTEST_LIBRARY})
+    TARGET_COMPILE_OPTIONS(${benchmark_name} PUBLIC -pthread)
+    TARGET_INCLUDE_DIRECTORIES(${benchmark_name} SYSTEM PRIVATE
+      ${BENCHMARK_INCLUDE_DIR}
+      ${GTEST_INCLUDE_DIR}
+      "${CMAKE_BINARY_DIR}/include")
+    SET_TARGET_PROPERTIES(${benchmark_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/benchmarks")
+  ENDFOREACH(file benchmark_list)
+ELSE()
+  MESSAGE(STATUS "Skipped generation of benchmarks.")
+ENDIF()
 

@@ -1,8 +1,7 @@
 #pragma once
 
-#include "object.hpp"
-#include "list.hpp"
 #include "collection.hpp"
+#include "list.hpp"
 
 namespace wiremap{
     template<typename T>
@@ -14,7 +13,7 @@ namespace wiremap{
 
     public:
         template<typename V, typename = std::enable_if_t<detail::is_wiremap_object_v<V> == detail::is_specialization_of<V, Constant>::value>>
-        Constant(V v)noexcept{
+        Constant(const V& v)noexcept{
             value = T(v);
         }
 
@@ -26,8 +25,8 @@ namespace wiremap{
         }
 
         template<typename = std::enable_if<detail::is_list_specialization<T>::value>>
-        constexpr const auto& operator[](const std::size_t& I)const noexcept{
-            return value[I];
+        constexpr const auto& operator[](const std::size_t& pos)const noexcept{
+            return value[pos];
         }
 
         template<std::size_t I, typename... Args>

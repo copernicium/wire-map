@@ -13,26 +13,26 @@ namespace wiremap{
         }
 
         template<typename ArrT, typename = std::enable_if_t<std::is_convertible_v<ArrT, T>>>
-        List(std::array<ArrT,Size> arr)noexcept: List(){
+        List(const std::array<ArrT,Size>& arr)noexcept: List(){
             for(unsigned i = 0; i < this->_size; i++){
                 this->_internal[i] = arr[i];
             }
         }
 
         template<typename ListT, typename = std::enable_if_t<std::is_convertible_v<ListT, T>>>
-        List(std::initializer_list<ListT> list)noexcept: List(){
+        List(const std::initializer_list<ListT>& list)noexcept: List(){
             assert(list.size() == Size); //TODO std::initializer_list does not have compile-time size access
             std::copy(list.begin(), list.end(), this->_internal.begin());
         }
 
         ~List() = default;
 
-        constexpr const T& operator[](std::size_t pos)const noexcept{
+        constexpr const T& operator[](const std::size_t& pos)const noexcept{
             assert(pos >= 0 && pos < this->_size);
             return this->_internal[pos];
         }
 
-        constexpr T& operator[](std::size_t pos)noexcept{
+        constexpr T& operator[](const std::size_t& pos)noexcept{
             assert(pos >= 0 && pos < this->_size);
             return this->_internal[pos];
         }

@@ -7,12 +7,12 @@ namespace wiremap{
     namespace attributes{
         template<typename T, typename... AttributeChecks>
         struct Attribute{
-            static void verify(T){}
+            static void verify(const T&){}
         };
 
         template<typename T, typename First, typename... AttributeChecks>
         struct Attribute<T, First, AttributeChecks...>{
-            static void verify(T v){
+            static void verify(const T& v){
                 First::verify(v);
                 Attribute<T, AttributeChecks...>::verify(v);
             }
@@ -50,12 +50,12 @@ namespace wiremap{
             bool valid;
 
         public:
-            Object(T v, T default_v)noexcept: value(v), default_value(default_v),valid(true){
+            Object(const T& v, const T& default_v)noexcept: value(v), default_value(default_v),valid(true){
                 attributes::Attribute<T,Attributes...>::verify(v);
                 attributes::Attribute<T,Attributes...>::verify(default_v);
             }
 
-            Object(T v)noexcept: Object(v, DefaultValue){
+            Object(const T& v)noexcept: Object(v, DefaultValue){
                 attributes::Attribute<T,Attributes...>::verify(v);
             }
 
@@ -100,14 +100,14 @@ namespace wiremap{
         template<typename T>
         struct Integral{
             static_assert(std::is_integral_v<T>, "Integral defined with non-integral type");
-            static constexpr void verify(T)noexcept{}
+            static constexpr void verify(const T&)noexcept{}
         };
 
         template<typename T,auto DefaultValue, decltype(DefaultValue) Begin, decltype(DefaultValue) End>
         struct InRange{
             static_assert(Begin <= DefaultValue && DefaultValue <= End);
 
-            static constexpr void verify(T value)noexcept{
+            static constexpr void verify(const T& value)noexcept{
                 assert(Begin <= value && value <= End); //TODO invalidate data instead? throw?
             }
         };
