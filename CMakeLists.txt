@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.0.2)
-
-IF(NOT DEFINED CMAKE_TOOLCHAIN_FILE)
-  MESSAGE(FATAL_ERROR "Vcpkg toolchain not specified. Please run cmake again with -DCMAKE_TOOLCHAIN_FILE=path/to/vcpkg.cmake")
+IF(NOT DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+  MESSAGE(FATAL_ERROR "Vcpkg toolchain not specified. Please run cmake again with -DCMAKE_TOOLCHAIN_FILE=path/to/vcpkg.cmake or define environment variable VCPKG_ROOT as /path/to/vcpkg/source")
+ELSEIF(DEFINED ENV{VCPKG_ROOT})
+  set(CMAKE_TOOLCHAIN_FILE "${VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "")
 ENDIF()
 
 PROJECT(wire-map)

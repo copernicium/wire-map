@@ -8,14 +8,17 @@ Wire Map is a black-box model, device-mapping tool to specify how data flows and
 
 ## Building Wire Map
 
-Wire Map only has one dependency and that is sparsehash, which can be installed easily on Linux via the sparsehash package. On Windows, it can be download and built from its GitHub source. To build and run tests and benchmarks, Google Test and Benchmark will need to be installed using vcpkg.
+Wire Map requires GCC 8 or newer. Wire Map only has one dependency and that is sparsehash, which can be installed easily on Linux via the sparsehash package. On Windows, it can be download and built from its GitHub source. To build and run tests and benchmarks, Google Test and Benchmark will need to be installed using vcpkg.
 
 ```shell
 sudo apt update && sudo apt-get install cmake;
 suto apt install sparsehash
 
-vcpkg install gtest
+vcpkg install gtest                          # Note that these require pthread
 vcpkg install benchmark
+
+# Or, install vcpkg and gtest and benchmark using
+./install.sh /where/to/install/vcpkg/
 ```
 
 After the utilities have been installed, all that is left to do is build.
