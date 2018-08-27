@@ -8,6 +8,8 @@ Wire Map is a black-box model, device-mapping tool to specify how data flows and
 
 ## Building Wire Map
 
+[![Build Status](https://travis-ci.com/copernicium/wire-map.svg?branch=master)](https://travis-ci.com/copernicium/wire-map)
+
 Wire Map requires GCC 8 or newer. Wire Map only has one dependency and that is sparsehash, which can be installed easily on Linux via the sparsehash package. On Windows, it can be download and built from its GitHub source. To build and run tests and benchmarks, Google Test and Benchmark will need to be installed using vcpkg.
 
 ```shell
