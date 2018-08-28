@@ -17,12 +17,9 @@ namespace wiremap{
     public:
         Parameter(const detail::KeyType& d_src, const detail::KeyType& r_src)noexcept: source_device_hash(d_src), source_result_hash(r_src), update_count(0){}
 
-        template<typename S>
-        Parameter(Parameter<S>&) = delete;
-
         Parameter() = delete;
 
-        const std::shared_ptr<detail::ResultBase>& get()const noexcept{ //TODO update update_count
+        const std::shared_ptr<const detail::ResultBase> get()const noexcept{ //TODO update update_count
             return WireMap::get(source_device_hash).getResult(source_result_hash);
         }
     };

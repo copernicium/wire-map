@@ -8,8 +8,9 @@ using namespace wiremap;
 TEST(DeviceTest, ParameterTest){
     Result<Integer> r = {hashstr("spark1"), 5};
 
-    WireMap::get(hashstr("spark1")) = Device();
-    WireMap::get(hashstr("spark1")).getResult(hashstr("current")) = std::make_shared<Result<Integer>>(r);
+    WireMap::get(hashstr("spark1")) = Device(
+        std::make_pair(hashstr("current"),std::make_shared<Result<Integer>>(r))
+    );
 
     Parameter<Integer> p = {hashstr("spark1"), hashstr("current")};
     Result<Integer> r2 = getResult(p);

@@ -20,14 +20,15 @@ namespace wiremap{
 
     public:
         const std::shared_ptr<T>& get(){
-            bool update = false;
             for(const std::pair<detail::KeyType, detail::KeyType>& source_parameter: *source_parameter_hashes){
-                //TODO check if results parameters point to have been updated
-            }
-            if(update){
-                update_count++;
-                //update_function
-                // return WireMap::get(source_device_hash).getParameter(source_parameter_hashes);
+                /*
+                TODO check if results parameters point to have been updated
+                if(update case){
+                    update_count++;
+                    auto param = WireMap::get(source_device_hash).getParameter(source_parameter);
+                    cache = update_function(param);
+                }
+                */
             }
             return cache;
         }

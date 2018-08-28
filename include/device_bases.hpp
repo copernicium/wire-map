@@ -3,15 +3,19 @@
 #include <memory>
 
 namespace wiremap::detail{
-    struct ParameterBase{
+    struct DeviceMemberBase{
+        virtual ~DeviceMemberBase() = default;
+    };
+
+    struct ParameterBase: public DeviceMemberBase{
         virtual ~ParameterBase() = default;
     };
 
-    struct ConstantBase{
+    struct ConstantBase: public DeviceMemberBase{
         virtual ~ConstantBase() = default;
     };
 
-    struct ResultBase{
+    struct ResultBase: public DeviceMemberBase{
         virtual ~ResultBase() = default;
     };
 }
