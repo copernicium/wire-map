@@ -52,6 +52,7 @@ TEST(ObjectTest, AccessTest){
         Real b = 3;
         Real c = a + b; //TODO this shouldn't be possible. Only allow operations on objects of the same tyoe
         bool d = a == b;
+        (void)d;
     }
     //addition
     {
