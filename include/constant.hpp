@@ -9,7 +9,7 @@ namespace wiremap{
     struct Constant: public detail::ObjectBase, public detail::ConstantBase{
         static_assert(detail::is_wiremap_object_v<T>,"Constant built from type not derived from detail::ObjectBase");
 
-    protected:
+    private:
         T value;
 
     public:

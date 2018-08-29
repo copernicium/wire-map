@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional> //TODO remove
 #include <memory>
 #include "device_bases.hpp"
 #include "function.hpp"
@@ -11,25 +12,34 @@ namespace wiremap{
     template<typename T>
     struct Result: public detail::ResultBase{
         static_assert(detail::is_wiremap_object_v<T>,"Constant built from type not derived from detail::ObjectBase");
-    protected:
+
+    private:
         detail::KeyType source_device_key;
         std::shared_ptr<google::dense_hash_map<detail::KeyType,detail::KeyType,detail::Hasher,detail::KeyCompare>> source_parameter_hashes;
         unsigned update_count;
         std::shared_ptr<T> cache;
-        Function update_function;
+        std::function<T(void)> update_function; //TODO use wire map function instead
 
         void setSourceDeviceKey(const detail::KeyType& D_KEY){
             source_device_key = D_KEY;
         }
 
     public:
+        unsigned getUpdateCount()const{
+            return update_count;
+        }
+
         const std::shared_ptr<T>& get(){
+            if(cache == nullptr){
+                cache = std::make_shared<T>(update_function());
+            }
             for(const std::pair<detail::KeyType, detail::KeyType>& source_parameter: *source_parameter_hashes){
                 /*
                 TODO check if results parameters point to have been updated
                 if(update case){
                     update_count++;
                     auto param = WireMap::get(source_device_hash).getParameter(source_parameter);
+                    param.updateCount()
                     cache = update_function(param);
                 }
                 */
@@ -37,9 +47,9 @@ namespace wiremap{
             return cache;
         }
 
-        Result(const T& v): source_device_key(0), source_parameter_hashes(std::make_shared<google::dense_hash_map<detail::KeyType,detail::KeyType,detail::Hasher,detail::KeyCompare>>()), update_count(0), cache(std::make_shared<T>(v)){
+        Result(const std::function<T(void)>& F): source_device_key(0), source_parameter_hashes(std::make_shared<google::dense_hash_map<detail::KeyType,detail::KeyType,detail::Hasher,detail::KeyCompare>>()), update_count(0), cache(nullptr), update_function(F){
             source_parameter_hashes->set_empty_key(0);
-        } //TODO no result constructor should take a T--take an update function and use that instead
+        }
 
         Result() = delete;
 
@@ -71,7 +81,6 @@ namespace wiremap{
         if(A.update_function != B.update_function){
             return false;
         }
-        //TODO add all
         if((A.cache == nullptr) != (B.cache == nullptr)){
             return false;
         }

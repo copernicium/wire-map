@@ -6,7 +6,7 @@
 using namespace wiremap;
 
 TEST(DeviceTest, ParameterTest){
-    Result<Integer> r = {5};
+    Result<Integer> r = std::function<Integer(void)>([]{ return 5; });
 
     WireMap::add(
         hashstr("spark1"),

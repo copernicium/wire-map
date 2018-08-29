@@ -19,7 +19,7 @@ static void BM_ConstantConstructor(benchmark::State& state) {
 
 static void BM_ResultConstructor(benchmark::State& state) {
     for(auto _ : state){
-        Result<Integer> r = {5};
+        Result<Integer> r = std::function<Integer(void)>([]{ return 5; });
     }
 }
 
@@ -40,7 +40,7 @@ static void BM_DeviceConstructor1(benchmark::State& state) {
 
 static void BM_DeviceConstructor2(benchmark::State& state) {
     Parameter<Integer> p = {hashstr("roborio"), hashstr("pulse_width_1")};
-    Result<Integer> r = {5};
+    Result<Integer> r = std::function<Integer(void)>([]{ return 5; });
     for(auto _ : state){
         Device spark1 = {
             std::make_pair(hashstr("pulse_width_1"),p),
@@ -51,7 +51,7 @@ static void BM_DeviceConstructor2(benchmark::State& state) {
 
 static void BM_DeviceSetup(benchmark::State& state) {
     for(auto _ : state){
-        Result<Integer> r = {5};
+        Result<Integer> r = std::function<Integer(void)>([]{ return 5; });
 
         WireMap::add(
             hashstr("spark1"),
@@ -63,7 +63,7 @@ static void BM_DeviceSetup(benchmark::State& state) {
 }
 
 static void BM_ParameterAccess(benchmark::State& state) {
-    Result<Integer> r = {5};
+    Result<Integer> r = std::function<Integer(void)>([]{ return 5; });
 
     WireMap::add(
         hashstr("spark1"),

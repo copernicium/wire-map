@@ -56,28 +56,12 @@ namespace wiremap{
             }
         }
 
-        template<typename First, typename... Members>
-        Device(const detail::KeyType& DEVICE_KEY, const std::pair<detail::KeyType, First>& first_member, Members... members)noexcept: Device(members...){
-            static_assert(std::is_base_of_v<detail::DeviceMemberBase,First>, "Constructing device from non-member type");
-            if constexpr(std::is_base_of_v<detail::ResultBase,First>){
-                if(results == nullptr){
-                    results = std::make_shared<google::dense_hash_map<detail::KeyType,std::shared_ptr<detail::ResultBase>,detail::Hasher,detail::KeyCompare>>();
-                    results->set_empty_key(0);
+        template<typename... Members>
+        Device(const detail::KeyType& DEVICE_KEY, Members... members)noexcept: Device(members...){
+            if(results != nullptr){
+                for(std::pair<detail::KeyType, std::shared_ptr<detail::ResultBase>> result: *results){
+                    result.second->setSourceDeviceKey(DEVICE_KEY);
                 }
-                (*results)[first_member.first] = std::make_shared<First>(first_member.second);
-                std::dynamic_pointer_cast<First>((*results)[first_member.first])->setSourceDeviceKey(DEVICE_KEY);
-            } else if constexpr(std::is_base_of_v<detail::ParameterBase,First>){
-                if(parameters == nullptr){
-                    parameters = std::make_shared<google::dense_hash_map<detail::KeyType,std::shared_ptr<detail::ParameterBase>,detail::Hasher,detail::KeyCompare>>();
-                    parameters->set_empty_key(0);
-                }
-                (*parameters)[first_member.first] = std::make_shared<First>(first_member.second);
-            } else if constexpr(std::is_base_of_v<detail::ConstantBase,First>){
-                if(constants == nullptr){
-                    constants = std::make_shared<google::dense_hash_map<detail::KeyType,std::shared_ptr<detail::ConstantBase>,detail::Hasher,detail::KeyCompare>>();
-                    constants->set_empty_key(0);
-                }
-                (*constants)[first_member.first] = std::make_shared<First>(first_member.second);
             }
         }
     };
