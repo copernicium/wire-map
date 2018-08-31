@@ -1,0 +1,4 @@
+Function Integer Fun(Integer Coefficient, Integer PulseWidth)
+    if Coefficient is 0 then
+        Output 1000
+    Output Coefficient * PulseWidth

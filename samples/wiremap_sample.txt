@@ -1,0 +1,4 @@
+RoboRIO roborio
+
+Spark spark1
+    PulseWidth <- roborio.PWM1
