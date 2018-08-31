@@ -1,11 +1,7 @@
 #pragma once
 
-#include <optional>
-#include <string>
+#include "device_parser.hpp"
 
 namespace wiremap::parser{
-    using ParseInput = std::string;
-
-    template<typename R>
-    using ParseResult = std::optional<std::pair<R,std::string>>;
+    std::vector<std::string> readFile(const std::string&);
 }

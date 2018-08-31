@@ -35,9 +35,13 @@ ELSE()
 ENDIF()
 
 ADD_LIBRARY(parser SHARED
+  parser/src/parser_util.cpp
+  parser/src/object_parser.cpp
+  parser/src/device_parser.cpp
   parser/src/parser.cpp)
 
 TARGET_INCLUDE_DIRECTORIES(parser PRIVATE
+  "${CMAKE_BINARY_DIR}/include"
   "${CMAKE_BINARY_DIR}/parser/include")
 
 ADD_LIBRARY(wiremap SHARED
@@ -61,10 +65,11 @@ IF(TESTING MATCHES "[Tt][Rr][Uu][Ee]" OR TESTING MATCHES "[Oo][Nn]")
 
     ADD_EXECUTABLE(${test_name} ${file} tests/main_stub.cpp)
 
-    TARGET_LINK_LIBRARIES(${test_name} wiremap pthread ${GTEST_LIBRARY})
+    TARGET_LINK_LIBRARIES(${test_name} wiremap parser pthread ${GTEST_LIBRARY})
     TARGET_COMPILE_OPTIONS(${test_name} PUBLIC -pthread)
     TARGET_INCLUDE_DIRECTORIES(${test_name} SYSTEM PRIVATE
       ${GTEST_INCLUDE_DIR}
+      "${CMAKE_BINARY_DIR}/parser/include"
       "${CMAKE_BINARY_DIR}/include")
     SET_TARGET_PROPERTIES(${test_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests")
   ENDFOREACH(file test_list)
@@ -88,11 +93,12 @@ IF(BENCHMARK MATCHES "[Tt][Rr][Uu][Ee]" OR BENCHMARK MATCHES "[Oo][Nn]")
 
     ADD_EXECUTABLE(${benchmark_name} ${file})
 
-    TARGET_LINK_LIBRARIES(${benchmark_name} wiremap pthread ${BENCHMARK_LIBRARY} ${GTEST_LIBRARY})
+    TARGET_LINK_LIBRARIES(${benchmark_name} wiremap parser pthread ${BENCHMARK_LIBRARY} ${GTEST_LIBRARY})
     TARGET_COMPILE_OPTIONS(${benchmark_name} PUBLIC -pthread)
     TARGET_INCLUDE_DIRECTORIES(${benchmark_name} SYSTEM PRIVATE
       ${BENCHMARK_INCLUDE_DIR}
       ${GTEST_INCLUDE_DIR}
+      "${CMAKE_BINARY_DIR}/parser/include"
       "${CMAKE_BINARY_DIR}/include")
     SET_TARGET_PROPERTIES(${benchmark_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/benchmarks")
   ENDFOREACH(file benchmark_list)

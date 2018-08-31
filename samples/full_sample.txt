@@ -30,8 +30,6 @@ Device Spark
 Device CIM
     Parameter Real Current
 
-    Result Load
-
     Constant Real Coefficient1
 
     Constant Real Coefficient2
@@ -64,12 +62,12 @@ Spark spark1                                                     # "spark1" beco
     PulseWidth <- roborio.PWM1                                   # Link PulseWidth Parameter to Result of roborio.PWM1
 
 CIM cim1
-    Current <-spark1.Current
+    Current <- spark1.Current
     Coefficient1 = 3
     Coefficient2 = 5
 
 CIM cim2
-    Current <-spark1.Current
+    Current <- spark1.Current
     Coefficient1 = 3
     Coefficient2 = 5
 
