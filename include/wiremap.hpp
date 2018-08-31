@@ -18,6 +18,11 @@ namespace wiremap{
             (*devices)[KEY] = Device(KEY, device_members...);
         }
 
+        template<typename... DeviceMembers>
+        static void add(const std::string& KEY, const DeviceMembers&... device_members)noexcept{
+            add(hashstr(KEY), device_members...);
+        }
+
         static Device& get(const detail::KeyType& KEY)noexcept{
             if(devices == nullptr){
                 devices = std::make_shared<google::dense_hash_map<detail::KeyType,Device,detail::Hasher,detail::KeyCompare>>();
@@ -25,6 +30,10 @@ namespace wiremap{
             }
             assert(devices->find(KEY) != devices->end());
             return (*devices)[KEY];
+        }
+
+        static Device& get(const std::string& KEY)noexcept{
+            return get(hashstr(KEY));
         }
 
         WireMap() = delete;

@@ -9,11 +9,11 @@ TEST(DeviceTest, ParameterTest){
     Result<Integer> r = std::function<Integer(void)>([]{ return 5; });
 
     WireMap::add(
-        hashstr("spark1"),
-        std::make_pair(hashstr("current"),r)
+        "spark1",
+        std::make_pair("current",r)
     );
 
-    Parameter<Integer> p = {hashstr("spark1"), hashstr("current")};
+    Parameter<Integer> p = {"spark1", "current"};
     Result<Integer> r2 = getResult(p);
 
     EXPECT_EQ(r2.get()->require(),5);

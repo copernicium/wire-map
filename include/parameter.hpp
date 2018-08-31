@@ -22,6 +22,8 @@ namespace wiremap{
     public:
         Parameter(const detail::KeyType& d_src, const detail::KeyType& r_src)noexcept: source_device_key(d_src), source_result_key(r_src), update_count(0){}
 
+        Parameter(const std::string& d_src, const std::string& r_src)noexcept: Parameter(hashstr(d_src),hashstr(r_src)){}
+
         Parameter() = delete;
 
         const std::shared_ptr<const detail::ResultBase> get()const noexcept{

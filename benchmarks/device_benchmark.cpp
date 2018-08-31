@@ -7,7 +7,7 @@ using namespace wiremap;
 
 static void BM_ParameterConstructor(benchmark::State& state) {
     for(auto _ : state){
-        Parameter<Integer> p = {hashstr("roborio"), hashstr("pulse_width_1")};
+        Parameter<Integer> p = {"roborio", "pulse_width_1"};
     }
 }
 
@@ -30,21 +30,21 @@ static void BM_DeviceConstructor0(benchmark::State& state) {
 }
 
 static void BM_DeviceConstructor1(benchmark::State& state) {
-    Parameter<Integer> p = {hashstr("roborio"), hashstr("pulse_width_1")};
+    Parameter<Integer> p = {"roborio", "pulse_width_1"};
     for(auto _ : state){
         Device spark1 = {
-            std::make_pair(hashstr("pulse_width_1"),p)
+            std::make_pair("pulse_width_1",p)
         };
     }
 }
 
 static void BM_DeviceConstructor2(benchmark::State& state) {
-    Parameter<Integer> p = {hashstr("roborio"), hashstr("pulse_width_1")};
+    Parameter<Integer> p = {"roborio", "pulse_width_1"};
     Result<Integer> r = std::function<Integer(void)>([]{ return 5; });
     for(auto _ : state){
         Device spark1 = {
-            std::make_pair(hashstr("pulse_width_1"),p),
-            std::make_pair(hashstr("current"),r)
+            std::make_pair("pulse_width_1",p),
+            std::make_pair("current",r)
         };
     }
 }
@@ -54,11 +54,11 @@ static void BM_DeviceSetup(benchmark::State& state) {
         Result<Integer> r = std::function<Integer(void)>([]{ return 5; });
 
         WireMap::add(
-            hashstr("spark1"),
-            std::make_pair(hashstr("current"),r)
+            "spark1",
+            std::make_pair("current",r)
         );
 
-        Parameter<Integer> p = {hashstr("spark1"), hashstr("current")};
+        Parameter<Integer> p = {"spark1", "current"};
     }
 }
 
@@ -66,12 +66,12 @@ static void BM_ParameterAccess(benchmark::State& state) {
     Result<Integer> r = std::function<Integer(void)>([]{ return 5; });
 
     WireMap::add(
-        hashstr("spark1"),
-        std::make_pair(hashstr("current"),r)
+        "spark1",
+        std::make_pair("current",r)
     );
 
     for(auto _ : state){
-        Parameter<Integer> p = {hashstr("spark1"), hashstr("current")};
+        Parameter<Integer> p = {"spark1", "current"};
         Result<Integer> r2 = getResult(p);
 
         // printf("value:%ld \n",r2.get()->require());

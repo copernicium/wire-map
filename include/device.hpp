@@ -33,7 +33,7 @@ namespace wiremap{
         Device(const detail::KeyType&)noexcept{}
 
         template<typename First, typename... Members>
-        Device(const std::pair<detail::KeyType, First>& first_member, Members... members)noexcept: Device(members...){
+        Device(const std::pair<detail::KeyType, First>& first_member, const Members&... members)noexcept: Device(members...){
             static_assert(std::is_base_of_v<detail::DeviceMemberBase,First>, "Constructing device from non-member type");
             if constexpr(std::is_base_of_v<detail::ResultBase,First>){
                 if(results == nullptr){
@@ -56,13 +56,19 @@ namespace wiremap{
             }
         }
 
+        template<typename RawKeyType, typename First, typename... Members>
+        Device(const std::pair<RawKeyType, First>& first_member, const Members&... members)noexcept: Device(std::make_pair(hashstr(first_member.first),first_member.second), members...){}
+
         template<typename... Members>
-        Device(const detail::KeyType& DEVICE_KEY, Members... members)noexcept: Device(members...){
+        Device(const detail::KeyType& DEVICE_KEY, const Members&... members)noexcept: Device(members...){
             if(results != nullptr){
                 for(std::pair<detail::KeyType, std::shared_ptr<detail::ResultBase>> result: *results){
                     result.second->setSourceDeviceKey(DEVICE_KEY);
                 }
             }
         }
+
+        template<typename... Members>
+        Device(const std::string& DEVICE_KEY, const Members&... members)noexcept: Device(hashstr(DEVICE_KEY), members...){}
     };
 }
