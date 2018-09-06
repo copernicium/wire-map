@@ -1,6 +1,6 @@
 #include "parser/device_parser.hpp"
 
-#include "parser/parser_util.hpp"
+#include "parser/util.hpp"
 
 #include <string_view>
 

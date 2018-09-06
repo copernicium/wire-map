@@ -35,7 +35,8 @@ ELSE()
 ENDIF()
 
 ADD_LIBRARY(parser SHARED
-  src/parser/parser_util.cpp
+  src/parser/init.cpp
+  src/parser/util.cpp
   src/parser/type_parser.cpp
   src/parser/object_parser.cpp
   src/parser/device_parser.cpp

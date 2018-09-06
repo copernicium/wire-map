@@ -1,13 +1,13 @@
-#include "parser/parser_util.hpp"
+#include "parser/util.hpp"
 
-#include "parser/parser_constants.hpp"
+#include "parser/constants.hpp"
 
 namespace wiremap::parser{
     std::vector<std::string> splitLine(const std::string& LINE){
         std::vector<std::string> v;
         std::string a;
         for(char c: LINE){
-            if(c == ' '){
+            if(c == ' '){ //TODO split at ( and ) ?
                 if(!a.empty()){
                     v.push_back(a);
                     a = "";
