@@ -3,10 +3,11 @@
 #include "parser/type_parser.hpp"
 
 namespace wiremap::parser{
-    struct ObjectNode{
+    struct ResultNode{
         std::string name;
         Type type;
+        //TODO generating function
     };
 
-    std::optional<ObjectNode> parseObject(const std::string&);
+    std::optional<ResultNode> parseResult(const std::string&);
 }

@@ -1,12 +1,12 @@
-#include "parser/object_parser.hpp"
+#include "parser/constant_parser.hpp"
 
 #include "parser/util.hpp"
 
 namespace wiremap::parser{
-    std::optional<ObjectNode> parseObject(const std::string& LINE){
+    std::optional<ConstantNode> parseConstant(const std::string& LINE){
         std::vector<std::string> split_line = splitLine(LINE);
 
-        if(split_line.size() < 2){
+        if(split_line.size() < 3){
             return {};
         }
 
@@ -17,10 +17,10 @@ namespace wiremap::parser{
 
         std::string name = split_line[1];
 
-        ObjectNode object_node;
-        object_node.name = name;
-        object_node.type = type.value();
+        ConstantNode constant_node;
+        constant_node.name = name;
+        constant_node.type = type.value();
 
-        return {object_node};
+        return {constant_node};
     }
 }

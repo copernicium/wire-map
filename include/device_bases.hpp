@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "map.hpp"
+#include "map_util.hpp"
 
 namespace wiremap::detail{
     struct DeviceMemberBase{

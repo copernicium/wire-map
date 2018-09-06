@@ -52,7 +52,12 @@ Device Battery
         Require Output Voltage - Coefficient * TotalLoad         # Variables can be either a value, None, or a default value.
                                                                  # In cases where a non-None return is required, use "Require" to
                                                                  # get the default value; otherwise None propagates through
-########## Device tree file
+########## Wire map file
+
+import RoboRIO                                                   # Import needed devices
+import Spark
+import CIM
+import Battery
 
 RoboRIO roborio
 

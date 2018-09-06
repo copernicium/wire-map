@@ -7,10 +7,9 @@
 namespace wiremap::parser{
 
     std::optional<std::string> parseDeviceName(const std::vector<std::string>& LINE){
-        constexpr std::string_view DEVICE_FLAG = "Device";
         constexpr unsigned DEVICE_FLAG_POS = 0;
 
-        if(LINE.size() == 2 && LINE[DEVICE_FLAG_POS] == DEVICE_FLAG){
+        if(LINE.size() == 2 && LINE[DEVICE_FLAG_POS] == DeviceNode::KEYWORD){
             return {LINE[1]};
         }
         return {};

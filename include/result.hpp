@@ -4,7 +4,6 @@
 #include <memory>
 #include "device_bases.hpp"
 #include "function.hpp"
-#include "map.hpp"
 #include "object.hpp"
 #include "wiremap.hpp"
 

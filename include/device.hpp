@@ -2,7 +2,6 @@
 
 #include <memory>
 #include "device_bases.hpp"
-#include "map.hpp"
 
 namespace wiremap{
     struct Device{

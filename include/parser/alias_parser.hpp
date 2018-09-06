@@ -4,7 +4,7 @@
 #include <memory>
 #include <string>
 
-#include "map.hpp"
+#include "map_util.hpp"
 #include "parser/type_parser.hpp"
 
 namespace wiremap::parser{
