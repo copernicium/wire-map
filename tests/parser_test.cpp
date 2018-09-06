@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
 
-#include "parser.hpp"
+#include "parser/parser.hpp"
 
 using namespace wiremap::parser;
 

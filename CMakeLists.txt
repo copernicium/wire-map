@@ -35,14 +35,14 @@ ELSE()
 ENDIF()
 
 ADD_LIBRARY(parser SHARED
-  parser/src/parser_util.cpp
-  parser/src/object_parser.cpp
-  parser/src/device_parser.cpp
-  parser/src/parser.cpp)
+  src/parser/parser_util.cpp
+  src/parser/type_parser.cpp
+  src/parser/object_parser.cpp
+  src/parser/device_parser.cpp
+  src/parser/parser.cpp)
 
 TARGET_INCLUDE_DIRECTORIES(parser PRIVATE
-  "${CMAKE_BINARY_DIR}/include"
-  "${CMAKE_BINARY_DIR}/parser/include")
+  "${CMAKE_BINARY_DIR}/include")
 
 ADD_LIBRARY(wiremap SHARED
   src/object.cpp
@@ -69,7 +69,6 @@ IF(TESTING MATCHES "[Tt][Rr][Uu][Ee]" OR TESTING MATCHES "[Oo][Nn]")
     TARGET_COMPILE_OPTIONS(${test_name} PUBLIC -pthread)
     TARGET_INCLUDE_DIRECTORIES(${test_name} SYSTEM PRIVATE
       ${GTEST_INCLUDE_DIR}
-      "${CMAKE_BINARY_DIR}/parser/include"
       "${CMAKE_BINARY_DIR}/include")
     SET_TARGET_PROPERTIES(${test_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/tests")
   ENDFOREACH(file test_list)
@@ -98,7 +97,6 @@ IF(BENCHMARK MATCHES "[Tt][Rr][Uu][Ee]" OR BENCHMARK MATCHES "[Oo][Nn]")
     TARGET_INCLUDE_DIRECTORIES(${benchmark_name} SYSTEM PRIVATE
       ${BENCHMARK_INCLUDE_DIR}
       ${GTEST_INCLUDE_DIR}
-      "${CMAKE_BINARY_DIR}/parser/include"
       "${CMAKE_BINARY_DIR}/include")
     SET_TARGET_PROPERTIES(${benchmark_name} PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin/benchmarks")
   ENDFOREACH(file benchmark_list)

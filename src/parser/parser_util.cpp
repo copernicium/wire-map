@@ -1,6 +1,6 @@
-#include "parser_util.hpp"
+#include "parser/parser_util.hpp"
 
-#include "parser_constants.hpp"
+#include "parser/parser_constants.hpp"
 
 namespace wiremap::parser{
     std::vector<std::string> splitLine(const std::string& LINE){

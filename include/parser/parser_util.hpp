@@ -1,7 +1,6 @@
 #pragma once
 
-#include "parser_types.hpp"
-
+#include <string>
 #include <vector>
 
 namespace wiremap::parser{

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <optional>
+#include <vector>
 
-#include "object_parser.hpp"
-#include "parser_types.hpp"
+#include "parser/object_parser.hpp"
 
 namespace wiremap::parser{
     struct DeviceNode{
@@ -11,7 +11,7 @@ namespace wiremap::parser{
 
         std::vector<ObjectNode> parameters;
         std::vector<ObjectNode> constants;
-        std::vector<ObjectNode> results;
+        std::vector<int> results; //TODO
     };
 
     std::optional<DeviceNode> parseDevice(std::vector<std::string>&);
