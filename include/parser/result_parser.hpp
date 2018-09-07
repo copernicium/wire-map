@@ -7,6 +7,8 @@ namespace wiremap::parser{
         std::string name;
         Type type;
         //TODO generating function
+
+        static constexpr std::string_view KEYWORD = "Result";
     };
 
     std::optional<ResultNode> parseResult(const std::string&);

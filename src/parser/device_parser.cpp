@@ -2,6 +2,7 @@
 
 #include "parser/util.hpp"
 
+#include <iostream>
 #include <string_view>
 
 namespace wiremap::parser{
@@ -34,10 +35,25 @@ namespace wiremap::parser{
         device_node.name = name.value();
 
         for(unsigned i = DEVICE_START_LINE + 1; i < in.size(); i++){
-            if(indentCount(in[i]) == 0){ //end of device definition
+            if(indentCount(in[i]) == 0 && !in[i].empty()){ //end of device definition
                 break;
             }
+            std::cout<<in[i]<<"\n";
             std::vector<std::string> split_line = splitLine(in[i]);
+            if(!split_line.empty()){
+                if(split_line[0] == ParameterNode::KEYWORD){
+                    std::optional<ParameterNode> p = parseParameter(split_line);
+                    if(p){
+                        std::cout<<p.value().name<<"\n";
+                        std::cout<<(p.value().type.base_type == Type::BaseType::OBJECT)<<"\n";
+                    }
+                } else if(split_line[0] == ConstantNode::KEYWORD){
+                } else if(split_line[0] == ResultNode::KEYWORD){
+                } else {
+                    return {};
+                }
+                // std::cout<<split_line[0]<<"\n";
+            }
             end++;
         }
         return {device_node};

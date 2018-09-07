@@ -1,3 +1,7 @@
 Device Spark
+    Parameter Real VoltageIn
+
+    Constant Real Coefficient
+
     Result Integer Current
         Output 9

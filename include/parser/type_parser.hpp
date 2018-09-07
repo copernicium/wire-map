@@ -26,8 +26,9 @@ namespace wiremap::parser{
 
         BaseType base_type;
 
-        std::vector<UnderlyingType> underlying_types;
+        std::vector<UnderlyingType> underlying_types; //TODO getters and setters to limit this depending on BaseType
     };
 
+    std::optional<Type> parseType(const std::vector<std::string>&); //TODO replace all optional with exceptions
     std::optional<Type> parseType(const std::string&);
 }

@@ -14,6 +14,7 @@ namespace wiremap{
                 devices = std::make_shared<google::dense_hash_map<detail::KeyType,Device,detail::Hasher,detail::KeyCompare>>();
                 devices->set_empty_key(0);
             }
+            //TODO check if exists?
             (*devices)[KEY] = Device(KEY, DEVICE);
         }
 
@@ -22,16 +23,23 @@ namespace wiremap{
         }
 
         static Device& get(const detail::KeyType& KEY)noexcept{
-            if(devices == nullptr){
-                devices = std::make_shared<google::dense_hash_map<detail::KeyType,Device,detail::Hasher,detail::KeyCompare>>();
-                devices->set_empty_key(0);
-            }
-            assert(devices->find(KEY) != devices->end());
+            assert(devices != nullptr && devices->find(KEY) != devices->end());
             return (*devices)[KEY];
         }
 
         static Device& get(const std::string& KEY)noexcept{
             return get(hashstr(KEY));
+        }
+
+        static bool exists(const detail::KeyType& KEY)noexcept{
+            if(devices == nullptr){
+                return false;
+            }
+            return devices->find(KEY) != devices->end();
+        }
+
+        static bool exists(const std::string& KEY)noexcept{
+            return exists(hashstr(KEY));
         }
 
         WireMap() = delete;

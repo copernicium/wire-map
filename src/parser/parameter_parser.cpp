@@ -3,14 +3,12 @@
 #include "parser/util.hpp"
 
 namespace wiremap::parser{
-    std::optional<ParameterNode> parseParameter(const std::string& LINE){
-        std::vector<std::string> split_line = splitLine(LINE);
-
+    std::optional<ParameterNode> parseParameter(const std::vector<std::string>& split_line){
         if(split_line.size() < 3){
             return {};
         }
 
-        std::optional<Type> type = parseType(split_line[0]);
+        std::optional<Type> type = parseType(std::vector<std::string>{split_line.begin() + 1, split_line.end() - 1});
         if(!type){
             return {};
         }
@@ -22,5 +20,11 @@ namespace wiremap::parser{
         parameter_node.type = type.value();
 
         return {parameter_node};
+    }
+
+    std::optional<ParameterNode> parseParameter(const std::string& LINE){
+        std::vector<std::string> split_line = splitLine(LINE);
+        return parseParameter(split_line);
+
     }
 }
