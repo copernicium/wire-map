@@ -1,0 +1,124 @@
+# Example nodes shown using JSON, but would be c++ objects instead
+
+########## RoboRIO.wm (device definition file)
+
+Device RoboRIO
+    Result Real PWM1
+        Output 5
+
+# Parsed into DeviceNode
+# {
+#     name: "RoboRIO",
+#     parameters: [],
+#     constants: [],
+#     Results: [
+#          {
+#               name: "PWM1",
+#               type: {
+#                   base_type: OBJECT,
+#                   underlying_types: [REAL]
+#               },
+#               generating_function: {
+#                   ...                                                                                                 # FunctionNode, TBD
+#               }
+#          }
+#     ]
+# }
+#
+# Parser adds this DeviceNode to a google::dense_hash_map singleton with all the other devices
+
+########## Spark.wm (device definition file)
+
+Device Spark
+    Parameter Integer PulseWidth
+
+    Parameter Real VoltageIn
+
+    Constant Real Coefficient
+
+    Result Real Current
+        if PulseWidth < 1000 or PulseWidth > 1000 then
+            Output 0
+        Output Coefficient * PulseWidth
+
+# Parsed into DeviceNode
+# {
+#     name: "Spark",
+#     parameters: [
+#         {
+#             name: "PulseWidth",
+#             type: {
+#                 base_type: OBJECT,
+#                 underlying_types: [REAL]
+#             },
+#             source_device: UNDEFINED,                                                                                 # String or hash
+#             source_result: UNDEFINED
+#         },
+#         {
+#             name: "VoltageIn",
+#             type: {
+#                 base_type: OBJECT,
+#                 underlying_types: [REAL],
+#             },
+#             source_device: UNDEFINED,
+#             source_result: UNDEFINED
+#         }
+#     ],
+#     constants: [
+#         {
+#             name: "Coefficient",
+#             type: {
+#                 base_type: OBJECT,
+#                 underlying_types: [REAL],
+#             },
+#             value: UNDEFINED
+#         }
+#     ],
+#     Results: [
+#          {
+#               name: "Current",
+#               type: {
+#                   base_type: OBJECT,
+#                   underlying_types: [REAL]
+#               },
+#               generating_function: {
+#                   ...                                                                                                 # FunctionNode, TBD
+#               }
+#          }
+#     ]
+# }
+#
+# Parser adds this DeviceNode to a google::dense_hash_map singleton with all the other devices
+
+########## WireMap.wm (wire map set-up file)
+
+import RoboRIO
+import Spark
+
+# Parser parses RoboRIO.wm and Spark.wm into DeviceNodes
+
+RoboRIO roborio
+
+# Parser uses RoboRIO DeviceNode definition to add a new RoboRIO to the WireMap
+#
+# WireMap::add(
+#     "roborio",
+#     std::make_pair(Spark.result.name,{DeviceNode.result.generating_function})
+# );
+# 
+
+Spark spark1 
+    VoltageIn <- batt1.Voltage
+    Coefficient = 7
+    PulseWidth <- roborio.PWM1
+
+# Parser uses Spark DeviceNode definition to add a new Spark to the WireMap
+#
+# WireMap::add(
+#     "spark1",
+#     std::make_pair(Spark.parameter.name,{DeviceNode.parameter.source_device,DeviceNode.parameter.source_result}),     # Checks types for compatibility
+#     std::make_pair(Spark.constant.name,{7}),
+#     std::make_pair(Spark.result.name,{DeviceNode.result.generating_function})                                         # If not inferred, may have to specify type using member type details
+# );
+#
+# WireMap is now prepped for use
