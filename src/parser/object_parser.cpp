@@ -10,16 +10,9 @@ namespace wiremap::parser{
             return {};
         }
 
-        std::optional<Type> type = parseType(split_line[0]);
-        if(!type){
-            return {};
-        }
-
-        std::string name = split_line[1];
-
         ObjectNode object_node;
-        object_node.name = name;
-        object_node.type = type.value();
+        object_node.name = split_line[1];
+        object_node.type = Type::parse(std::vector<std::string>{split_line.begin(), split_line.end() - 1});
 
         return {object_node};
     }

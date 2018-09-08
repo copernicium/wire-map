@@ -1,5 +1,5 @@
 Device Spark
-    Parameter Real VoltageIn
+    Parameter List of 1 Bool VoltageIn
 
     Constant Real Coefficient
 

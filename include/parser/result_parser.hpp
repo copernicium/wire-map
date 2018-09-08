@@ -9,7 +9,10 @@ namespace wiremap::parser{
         //TODO generating function
 
         static constexpr std::string_view KEYWORD = "Result";
-    };
 
-    std::optional<ResultNode> parseResult(const std::string&);
+        ResultNode parse(const std::vector<std::string>&);
+        ResultNode parse(const std::string&);
+
+        std::string toString()const;
+    };
 }

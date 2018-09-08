@@ -13,8 +13,10 @@ namespace wiremap::parser{
         std::optional<std::string> source_result;
 
         static constexpr std::string_view KEYWORD = "Parameter";
-    };
 
-    std::optional<ParameterNode> parseParameter(const std::vector<std::string>&);
-    std::optional<ParameterNode> parseParameter(const std::string&);
+        static ParameterNode parse(const std::vector<std::string>&);
+        static ParameterNode parse(const std::string&);
+
+        std::string toString()const;
+    };
 }

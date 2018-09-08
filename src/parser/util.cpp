@@ -1,11 +1,13 @@
 #include "parser/util.hpp"
+#include <cassert>
 
 namespace wiremap::parser{
     std::vector<std::string> splitLine(const std::string& LINE){
         std::vector<std::string> v;
         std::string a;
-        for(char c: LINE){
-            if(c == ' '){ //TODO split at ( and ) ?
+        for(unsigned i = 0; i < LINE.size(); i++){
+            const char& c = LINE[i];
+            if(c == ' ' || (c == ',' && (i + 1) < LINE.size() && LINE[i + 1] == ' ')){ //TODO split at ( and ) ?
                 if(!a.empty()){
                     v.push_back(a);
                     a = "";
@@ -26,6 +28,20 @@ namespace wiremap::parser{
         if(LINE.size() < detail::INDENT.size()){
             return false;
         }
-        return LINE.substr(0, detail::INDENT.size()) == detail::INDENT;
+        std::size_t spaces = LINE.find_first_not_of(" ");
+        if(spaces == std::string::npos){
+            return 0;
+        }
+        assert(spaces % detail::INDENT.size() == 0);
+        return spaces / detail::INDENT.size();
+    }
+
+    bool isNumber(const std::string& IN){
+        for(const char& c: IN){
+            if(!std::isdigit(c)){
+                return false;
+            }
+        }
+        return true;
     }
 }

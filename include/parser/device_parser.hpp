@@ -14,9 +14,12 @@ namespace wiremap::parser{
         std::vector<ResultNode> results;
 
         static constexpr std::string_view KEYWORD = "Device";
+
+        static DeviceNode parse(std::vector<std::string>&);
+
+        std::string toString()const;
     };
 
-    std::optional<DeviceNode> parseDevice(std::vector<std::string>&);
 
     struct DeviceNodes{
     private:

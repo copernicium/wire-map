@@ -51,8 +51,8 @@ Device Spark
 #                 base_type: OBJECT,
 #                 underlying_types: [REAL]
 #             },
-#             source_device: UNDEFINED,                                                                                 # String or hash
-#             source_result: UNDEFINED
+#             source_device: NULL,                                                                                 # String or hash
+#             source_result: NULL
 #         },
 #         {
 #             name: "VoltageIn",
@@ -60,8 +60,8 @@ Device Spark
 #                 base_type: OBJECT,
 #                 underlying_types: [REAL],
 #             },
-#             source_device: UNDEFINED,
-#             source_result: UNDEFINED
+#             source_device: NULL,
+#             source_result: NULL
 #         }
 #     ],
 #     constants: [
@@ -71,7 +71,7 @@ Device Spark
 #                 base_type: OBJECT,
 #                 underlying_types: [REAL],
 #             },
-#             value: UNDEFINED
+#             value: NULL
 #         }
 #     ],
 #     Results: [

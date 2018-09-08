@@ -11,7 +11,10 @@ namespace wiremap::parser{
         std::optional<std::string> value;
 
         static constexpr std::string_view KEYWORD = "Constant";
-    };
 
-    std::optional<ConstantNode> parseConstant(const std::string&);
+        static ConstantNode parse(const std::vector<std::string>&);
+        static ConstantNode parse(const std::string&);
+
+        std::string toString()const;
+    };
 }

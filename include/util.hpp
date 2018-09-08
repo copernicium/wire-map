@@ -4,6 +4,12 @@
 #include <type_traits>
 #include <tuple>
 
+
+#define NYI { \
+    printf("NYI %s:%d\n", __FILE__, __LINE__); \
+    exit(EXIT_FAILURE);                        \
+}
+
 namespace wiremap::detail{
     template<typename T, template <typename...> typename Template>
     struct is_specialization_of: public std::false_type{};

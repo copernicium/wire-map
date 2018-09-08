@@ -39,8 +39,9 @@ ADD_LIBRARY(parser SHARED
   src/parser/util.cpp
   src/parser/type_parser.cpp
   src/parser/object_parser.cpp
-  src/parser/constant_parser.cpp
   src/parser/parameter_parser.cpp
+  src/parser/constant_parser.cpp
+  src/parser/result_parser.cpp
   src/parser/device_parser.cpp
   src/parser/parser.cpp)
 
