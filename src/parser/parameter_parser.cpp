@@ -20,10 +20,10 @@ namespace wiremap::parser{
 
     std::string ParameterNode::toString()const{
         std::string a = "{";
-        a += "name:" + name + ", ";
-        a += "type:" + type.toString() + ", ";
-        a += "source_device:" + (source_device ? source_device.value() : "null") + ", ";
-        a += "source_result:" + (source_result ? source_result.value() : "null");
+        a += "\"name\":\"" + name + "\", ";
+        a += "\"type\":" + type.toString() + ", ";
+        a += "\"source_device\":" + (source_device ? source_device.value() : "null") + ", ";
+        a += "\"source_result\":" + (source_result ? source_result.value() : "null");
         a += "}";
         return a;
     }

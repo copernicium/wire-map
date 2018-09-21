@@ -20,9 +20,9 @@ namespace wiremap::parser{
 
     std::string ConstantNode::toString()const{
         std::string a = "{";
-        a += "name:" + name + ", ";
-        a += "type:" + type.toString() + ", ";
-        a += "value:" + (value ? value.value() : "null");
+        a += "\"name\":\"" + name + "\", ";
+        a += "\"type\":" + type.toString() + ", ";
+        a += "\"value\":" + (value ? value.value() : "null");
         a += "}";
         return a;
     }

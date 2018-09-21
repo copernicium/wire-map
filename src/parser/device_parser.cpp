@@ -50,10 +50,10 @@ namespace wiremap::parser{
 
     std::string DeviceNode::toString()const{
         std::string a = "{";
-        a += "name:" + name + ", ";
-        a += "parameters:" + asString(parameters, &ParameterNode::toString) + ", ";
-        a += "constants:" + asString(constants, &ConstantNode::toString) + ", ";
-        a += "results:" + asString(results, &ResultNode::toString);
+        a += "\"name\":\"" + name + "\", ";
+        a += "\"parameters\":" + asString(parameters, &ParameterNode::toString) + ", ";
+        a += "\"constants\":" + asString(constants, &ConstantNode::toString) + ", ";
+        a += "\"results\":" + asString(results, &ResultNode::toString);
         a += "}";
         return a;
     }

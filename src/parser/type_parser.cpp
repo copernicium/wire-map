@@ -10,11 +10,11 @@ namespace wiremap::parser{
     std::string asString(const Type::BaseType& IN){
         switch(IN){
         case Type::BaseType::LIST:
-            return "List";
+            return "\"List\"";
         case Type::BaseType::COLLECTION:
-            return "Collection";
+            return "\"Collection\"";
         case Type::BaseType::OBJECT:
-            return "Object";
+            return "\"Object\"";
         default:
             NYI
         }
@@ -23,23 +23,23 @@ namespace wiremap::parser{
     std::string asString(const Type::UnderlyingType& IN){
         switch(IN){
         case Type::UnderlyingType::BIT:
-            return "Bit";
+            return "\"Bit\"";
         case Type::UnderlyingType::CHAR:
-            return "Char";
+            return "\"Char\"";
         case Type::UnderlyingType::BYTE:
-            return "Byte";
+            return "\"Byte\"";
         case Type::UnderlyingType::WORD:
-            return "Word";
+            return "\"Word\"";
         case Type::UnderlyingType::DWORD:
-            return "DWord";
+            return "\"DWord\"";
         case Type::UnderlyingType::QWORD:
-            return "QWord";
+            return "\"QWord\"";
         case Type::UnderlyingType::INTEGER:
-            return "Integer";
+            return "\"Integer\"";
         case Type::UnderlyingType::BOOL:
-            return "Bool";
+            return "\"Bool\"";
         case Type::UnderlyingType::REAL:
-            return "Real";
+            return "\"Real\"";
         default:
             NYI
         }
@@ -147,14 +147,14 @@ namespace wiremap::parser{
 
     std::string Type::toString()const{
         std::string a = "{";
-        a += "base_type:" + asString(getBaseType()) + ", ";
+        a += "\"base_type\":" + asString(getBaseType()) + ", ";
         if(base_type == BaseType::LIST){
-            a += "list_size:" + std::to_string(getListSize()) + ", ";
+            a += "\"list_size\":" + std::to_string(getListSize()) + ", ";
         }
         if(base_type != BaseType::COLLECTION){
-            a += "underlying_type:" + asString(getUnderlyingType());
+            a += "\"underlying_type\":" + asString(getUnderlyingType());
         } else {
-            a += "underlying_types:" + asString(getUnderlyingTypes(), static_cast<std::string(*)(const Type::UnderlyingType&)>(asString));
+            a += "\"underlying_types\":" + asString(getUnderlyingTypes(), static_cast<std::string(*)(const Type::UnderlyingType&)>(asString));
         }
         a += "}";
         return a;
