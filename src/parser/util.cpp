@@ -44,4 +44,19 @@ namespace wiremap::parser{
         }
         return true;
     }
+
+    std::vector<std::string> captureScope(const std::vector<std::string>& LINES, unsigned scope_start){
+        if(LINES.empty()){
+            return LINES;
+        }
+        assert(scope_start < LINES.size());
+        unsigned scope_indent_count = indentCount(LINES[scope_start]);
+        unsigned scope_end = 0;
+        for(scope_end = scope_start + 1; scope_end < LINES.size(); scope_end++){//start search on next line
+            if(indentCount(LINES[scope_end]) <= scope_indent_count){
+                break;
+            }
+        }
+        return std::vector<std::string>{LINES.begin() + scope_start, LINES.begin() + scope_end};
+    }
 }

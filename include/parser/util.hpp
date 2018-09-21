@@ -29,4 +29,6 @@ namespace wiremap::parser{
         a += "]";
         return a;
     }
+
+    std::vector<std::string> captureScope(const std::vector<std::string>&, unsigned scope_start = 0);
 }

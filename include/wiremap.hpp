@@ -14,7 +14,7 @@ namespace wiremap{
                 devices = std::make_shared<google::dense_hash_map<detail::KeyType,Device,detail::Hasher,detail::KeyCompare>>();
                 devices->set_empty_key(0);
             }
-            //TODO check if exists?
+            assert(!exists(KEY));
             (*devices)[KEY] = Device(KEY, DEVICE);
         }
 

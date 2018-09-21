@@ -1,0 +1,4 @@
+PhoneNumber as List of 10 Integer
+
+Device Person
+    Constant PhoneNumber Contact

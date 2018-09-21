@@ -135,6 +135,9 @@ namespace wiremap::parser{
         } else if(in.front() == LIST_KEYWORD){
             type = Type::parseList(in);
         } else {
+            if(AliasMap::exists(in.front())){
+                return AliasMap::get(in.front());
+            }
             type = Type::parseObject(in.front());
         }
 

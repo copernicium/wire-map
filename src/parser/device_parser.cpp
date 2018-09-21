@@ -8,32 +8,29 @@
 namespace wiremap::parser{
 
     std::string parseDeviceName(const std::vector<std::string>& LINE){
-        constexpr unsigned DEVICE_FLAG_POS = 0;
-
-        if(LINE.size() == 2 && LINE[DEVICE_FLAG_POS] == DeviceNode::KEYWORD){
+        if(LINE.size() == 2 && LINE[DeviceNode::KEYWORD_POS] == DeviceNode::KEYWORD){
             return {LINE[1]};
         }
         assert(0);
     }
 
-    DeviceNode DeviceNode::parse(std::vector<std::string>& in){
-        assert(!in.empty());
+    DeviceNode DeviceNode::parse(const std::vector<std::string>& IN){
+        assert(!IN.empty());
 
         constexpr unsigned DEVICE_START_LINE = 0;
 
         DeviceNode device_node;
-        device_node.name = parseDeviceName(splitLine(in[DEVICE_START_LINE]));
+        device_node.name = parseDeviceName(splitLine(IN[DEVICE_START_LINE]));
 
-        for(unsigned i = DEVICE_START_LINE + 1; i < in.size(); i++){
-            unsigned indent_count = indentCount(in[i]);
-            if(indent_count != 1 && !in[i].empty()){
+        for(unsigned i = DEVICE_START_LINE + 1; i < IN.size(); i++){
+            unsigned indent_count = indentCount(IN[i]);
+            if(indent_count != 1 && !IN[i].empty()){
                 if(indent_count == 0){ //end of device definition
-                    //TODO either delete between DEVICE_START_LINE and i or make parameter const
                     break;
                 }
                 continue;
             }
-            std::vector<std::string> split_line = splitLine(in[i]);
+            std::vector<std::string> split_line = splitLine(IN[i]);
             if(!split_line.empty()){
                 if(split_line.front() == ParameterNode::KEYWORD){
                     device_node.parameters.push_back(ParameterNode::parse(split_line));

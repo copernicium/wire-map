@@ -8,7 +8,10 @@
 #include "parser/type_parser.hpp"
 
 namespace wiremap::parser{
-    struct AliasMap{ //TODO add Real, Bool, etc by default
+    struct AliasMap{ //TODO rename to TypeMap and move to types_parser
+        static constexpr unsigned KEYWORD_POS = 1;
+        static constexpr std::string_view KEYWORD = "as";
+
     private:
         static std::shared_ptr<google::dense_hash_map<detail::KeyType,Type,detail::Hasher,detail::KeyCompare>> aliases;
 
@@ -17,7 +20,22 @@ namespace wiremap::parser{
             if(aliases == nullptr){
                 aliases = std::make_shared<google::dense_hash_map<detail::KeyType,Type,detail::Hasher,detail::KeyCompare>>();
                 aliases->set_empty_key(0);
+                const std::array<std::string, 9> PRIMITIVES = {
+                    "Bit",
+                    "Char",
+                    "Byte",
+                    "Word",
+                    "DWord",
+                    "QWord",
+                    "Integer",
+                    "Bool",
+                    "Real"
+                };
+                for(const auto& a: PRIMITIVES){
+                    add(a,Type::parse(a));
+                }
             }
+            assert(!exists(KEY));
             aliases->insert(std::make_pair(KEY, VALUE));
         }
 
