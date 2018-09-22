@@ -54,4 +54,11 @@ namespace wiremap::parser{
         a += "}";
         return a;
     }
+
+    DeviceNode::DeviceNode(){}
+    DeviceNode::DeviceNode(const std::string& NAME, const std::vector<ParameterNode>& P, const std::vector<ConstantNode>& C, const std::vector<ResultNode>& R): name(NAME), parameters(P), constants(C), results(R){}
+
+    bool operator==(const DeviceNode& a, const DeviceNode& b){
+        return a.name == b.name && a.parameters == b.parameters && a.constants == b.constants && a.results == b.results;
+    }
 }

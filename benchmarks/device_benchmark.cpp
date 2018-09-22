@@ -47,19 +47,23 @@ static void BM_DeviceConstructor2(benchmark::State& state) {
             std::make_pair("current",r)
         };
     }
+    WireMap::reset();
 }
 
 static void BM_DeviceSetup(benchmark::State& state) {
+    unsigned i = 0;
     for(auto _ : state){
         Result<Integer> r = std::function<Integer(void)>([]{ return 5; });
 
         WireMap::add(
-            "spark1",
+            "spark" + std::to_string(i),
             std::make_pair("current",r)
         );
 
         Parameter<Integer> p = {"spark1", "current"};
+        i++;
     }
+    WireMap::reset();
 }
 
 static void BM_ParameterAccess(benchmark::State& state) {
@@ -76,6 +80,7 @@ static void BM_ParameterAccess(benchmark::State& state) {
 
         // printf("value:%ld \n",r2.get()->require());
     }
+    WireMap::reset();
 }
 
 BENCHMARK(BM_ParameterConstructor);

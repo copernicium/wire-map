@@ -16,24 +16,28 @@ namespace wiremap::parser{
         static std::shared_ptr<google::dense_hash_map<detail::KeyType,Type,detail::Hasher,detail::KeyCompare>> aliases;
 
     public:
+        static void reset(){
+            aliases = std::make_shared<google::dense_hash_map<detail::KeyType,Type,detail::Hasher,detail::KeyCompare>>();
+            aliases->set_empty_key(0);
+            const std::array<std::string, 9> PRIMITIVES = {
+                "Bit",
+                "Char",
+                "Byte",
+                "Word",
+                "DWord",
+                "QWord",
+                "Integer",
+                "Bool",
+                "Real"
+            };
+            for(const auto& a: PRIMITIVES){
+                add(a,Type::parse(a));
+            }
+        }
+
         static void add(const detail::KeyType& KEY, const Type& VALUE)noexcept{
             if(aliases == nullptr){
-                aliases = std::make_shared<google::dense_hash_map<detail::KeyType,Type,detail::Hasher,detail::KeyCompare>>();
-                aliases->set_empty_key(0);
-                const std::array<std::string, 9> PRIMITIVES = {
-                    "Bit",
-                    "Char",
-                    "Byte",
-                    "Word",
-                    "DWord",
-                    "QWord",
-                    "Integer",
-                    "Bool",
-                    "Real"
-                };
-                for(const auto& a: PRIMITIVES){
-                    add(a,Type::parse(a));
-                }
+                reset();
             }
             assert(!exists(KEY));
             aliases->insert(std::make_pair(KEY, VALUE));

@@ -26,4 +26,11 @@ namespace wiremap::parser{
         a += "}";
         return a;
     }
+
+    ConstantNode::ConstantNode(){}
+    ConstantNode::ConstantNode(const std::string& NAME, const Type& TYPE, const std::optional<std::string>& V): name(NAME), type(TYPE), value(V){}
+
+    bool operator==(const ConstantNode& a, const ConstantNode& b){
+        return a.name == b.name && a.type == b.type && a.value == b.value;
+    }
 }

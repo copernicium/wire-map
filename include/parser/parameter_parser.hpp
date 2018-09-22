@@ -18,5 +18,10 @@ namespace wiremap::parser{
         static ParameterNode parse(const std::string&);
 
         std::string toString()const;
+
+        ParameterNode();
+        ParameterNode(const std::string&, const Type&, const std::optional<std::string>&, const std::optional<std::string>&);
     };
+
+    bool operator==(const ParameterNode&, const ParameterNode&);
 }

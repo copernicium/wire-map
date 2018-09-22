@@ -9,10 +9,14 @@ namespace wiremap{
         static std::shared_ptr<google::dense_hash_map<detail::KeyType,Device,detail::Hasher,detail::KeyCompare>> devices;
 
     public:
+        static void reset(){
+            devices = std::make_shared<google::dense_hash_map<detail::KeyType,Device,detail::Hasher,detail::KeyCompare>>();
+            devices->set_empty_key(0);
+        }
+
         static void add(const detail::KeyType& KEY, const Device& DEVICE)noexcept{
             if(devices == nullptr){
-                devices = std::make_shared<google::dense_hash_map<detail::KeyType,Device,detail::Hasher,detail::KeyCompare>>();
-                devices->set_empty_key(0);
+                reset();
             }
             assert(!exists(KEY));
             (*devices)[KEY] = Device(KEY, DEVICE);

@@ -30,10 +30,14 @@ namespace wiremap::parser{
                 i += scope.size() - 1; //skip scope in next search
 
                 if(split_line.size() > DeviceNode::KEYWORD_POS && split_line[DeviceNode::KEYWORD_POS] == DeviceNode::KEYWORD){
-                    DeviceNode::parse(scope); //TODO
+                    DeviceNode a = DeviceNode::parse(scope);
+                    if(DeviceNodes::exists(a.name)){
+                        NYI //TODO error, redefinition
+                    }
+                    DeviceNodes::add(a.name,a);
                 } else if(split_line.size() > AliasMap::KEYWORD_POS && split_line[AliasMap::KEYWORD_POS] == AliasMap::KEYWORD){
                     if(AliasMap::exists(split_line.front())){
-                        NYI //TODO error, alias redefinition
+                        NYI //TODO error, redefinition
                     }
                     AliasMap::add(split_line.front(), Type::parse(std::vector<std::string>{split_line.begin() + AliasMap::KEYWORD_POS + 1, split_line.end()}));
                 }

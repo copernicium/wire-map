@@ -19,17 +19,26 @@ namespace wiremap::parser{
         static DeviceNode parse(const std::vector<std::string>&);
 
         std::string toString()const;
+
+        DeviceNode();
+        DeviceNode(const std::string&, const std::vector<ParameterNode>&, const std::vector<ConstantNode>&, const std::vector<ResultNode>&);
     };
+
+    bool operator==(const DeviceNode&, const DeviceNode&);
 
     struct DeviceNodes{
     private:
         static std::shared_ptr<google::dense_hash_map<detail::KeyType,DeviceNode,detail::Hasher,detail::KeyCompare>> device_nodes;
 
     public:
+        static void reset(){
+            device_nodes = std::make_shared<google::dense_hash_map<detail::KeyType,DeviceNode,detail::Hasher,detail::KeyCompare>>();
+            device_nodes->set_empty_key(0);
+        }
+
         static void add(const detail::KeyType& KEY, const DeviceNode& VALUE)noexcept{
             if(device_nodes == nullptr){
-                device_nodes = std::make_shared<google::dense_hash_map<detail::KeyType,DeviceNode,detail::Hasher,detail::KeyCompare>>();
-                device_nodes->set_empty_key(0);
+                reset();
             }
             device_nodes->insert(std::make_pair(KEY, VALUE));
         }
@@ -56,6 +65,21 @@ namespace wiremap::parser{
 
         static bool exists(const std::string& KEY)noexcept{
             return exists(hashstr(KEY));
+        }
+
+        static std::string toString(){
+            if(device_nodes == nullptr){
+                return "null";
+            }
+            std::string s = "[";
+            for(auto i = device_nodes->begin(); i != device_nodes->end(); ++i){
+                if(i != device_nodes->begin()){
+                    s += ", ";
+                }
+                s += i->second.toString();
+            }
+            s += "]";
+            return s;
         }
 
         DeviceNodes() = delete;

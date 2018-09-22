@@ -4,7 +4,7 @@
 
 namespace wiremap::parser{
     struct ConstantNode{
-        std::string name; //TODO hash?
+        std::string name;
 
         Type type;
 
@@ -15,6 +15,11 @@ namespace wiremap::parser{
         static ConstantNode parse(const std::vector<std::string>&);
         static ConstantNode parse(const std::string&);
 
+        ConstantNode();
+        ConstantNode(const std::string&, const Type&, const std::optional<std::string>&);
+
         std::string toString()const;
     };
+
+    bool operator==(const ConstantNode&, const ConstantNode&);
 }

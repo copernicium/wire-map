@@ -5,7 +5,7 @@
 
 namespace wiremap::parser{
     ResultNode ResultNode::parse(const std::vector<std::string>& split_line){
-        return {};
+        return {"", {}}; //TODO
     }
 
     ResultNode ResultNode::parse(const std::string& LINE){
@@ -14,7 +14,16 @@ namespace wiremap::parser{
 
     std::string ResultNode::toString()const{
         std::string a = "{";
+        a += "\"name\":\"" + name + "\", ";
+        a += "\"type\":" + type.toString() + ", ";
         a += "}";
         return a;
+    }
+
+    ResultNode::ResultNode(){}
+    ResultNode::ResultNode(const std::string& NAME, const Type& TYPE): name(NAME), type(TYPE){}
+
+    bool operator==(const ResultNode& a, const ResultNode& b){
+        return a.name == b.name && a.type == b.type;
     }
 }

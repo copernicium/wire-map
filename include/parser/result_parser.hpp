@@ -13,6 +13,11 @@ namespace wiremap::parser{
         ResultNode parse(const std::vector<std::string>&);
         ResultNode parse(const std::string&);
 
+        ResultNode();
+        ResultNode(const std::string&, const Type&);
+
         std::string toString()const;
     };
+
+    bool operator==(const ResultNode&, const ResultNode&);
 }

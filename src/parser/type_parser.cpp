@@ -162,4 +162,13 @@ namespace wiremap::parser{
         a += "}";
         return a;
     }
+
+    Type::Type(){}
+    Type::Type(const UnderlyingType& U): base_type(Type::BaseType::OBJECT), underlying_types({U}){}
+    Type::Type(const UnderlyingType& U, const unsigned& LEN): base_type(Type::BaseType::LIST), underlying_types({U}), list_size(LEN){}
+    Type::Type(const std::vector<UnderlyingType>& U):base_type(Type::BaseType::COLLECTION), underlying_types(U){}
+
+    bool operator==(const Type& a, const Type& b){
+        return a.base_type == b.base_type && a.underlying_types == b.underlying_types;
+    }
 }
