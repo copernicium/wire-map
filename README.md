@@ -10,24 +10,17 @@ Wire Map is a black-box model, device-mapping tool to specify how data flows and
 
 [![Build Status](https://travis-ci.com/copernicium/wire-map.svg?branch=master)](https://travis-ci.com/copernicium/wire-map)
 
-Wire Map requires GCC 8 or newer. Wire Map only has one dependency and that is sparsehash, which can be installed easily on Linux via the sparsehash package. On Windows, it can be download and built from its GitHub source. To build and run tests and benchmarks, Google Test and Benchmark will need to be installed using vcpkg.
+Wire Map requires GCC 8 or newer. Wire Map only has one dependency and that is sparsehash, which can be installed easily on Linux via the sparsehash package. On Windows, it can be download and built from its GitHub source.
 
 ```shell
 sudo apt update && sudo apt-get install cmake;
 suto apt install sparsehash
-
-vcpkg install gtest                          # Note that these require pthread
-vcpkg install benchmark
-
-# Or, install vcpkg and gtest and benchmark using
-./install.sh /where/to/install/vcpkg/
 ```
 
 After the utilities have been installed, all that is left to do is build.
 
 ```shell
-cmake . -DCMAKE_TOOLCHAIN_FILE=path/to/vcpkg.cmake \
-        -DCMAKE_BUILD_TYPE=RELEASE;
+cmake . -DCMAKE_BUILD_TYPE=RELEASE;
 make wiremap;
 ```
 
@@ -56,11 +49,17 @@ This directory contains all of the Google Benchmark benchmarking files for Wire 
 #### docs
 This directory contains a Doxygen Doxyfile and acts as the target for the documentation Doxygen generates.
 
+#### external
+This directory contains all of the necessary third party libraries such as Google Test.
+
 #### include
 This directory contains all of Wire Map's header files.
 
 #### lib and bin
 Wire Map's generated object files build to these directories.
+
+### samples
+Example files used in parsing tests.
 
 #### src
 This directory contains all of Wire Map's cpp files

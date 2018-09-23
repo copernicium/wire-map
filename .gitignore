@@ -1,6 +1,7 @@
 # Output folders
 lib/*
 bin/*
+external/*
 
 # CMake Files
 CMakeCache.txt

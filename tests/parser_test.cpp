@@ -9,14 +9,14 @@ TEST(ParserTest, DeviceTest){
     DeviceNode parsed = DeviceNode::parse(in);
     std::cout<<parsed.toString()<<"\n";
     DeviceNode expected = {
-            "Spark",
-            {
-                {"VoltageIn",{Type::UnderlyingType::BOOL,10}, {}, {}}
-            },
-            {
-                {"Coefficient",{Type::UnderlyingType::REAL}, {}}
-            },
-            {}
+        "Spark",
+        {
+            {"VoltageIn",{Type::UnderlyingType::BOOL,10}, {}, {}}
+        },
+        {
+            {"Coefficient",{Type::UnderlyingType::REAL}, {}}
+        },
+        {}
     };
     EXPECT_EQ(parsed, expected);
 }

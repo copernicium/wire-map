@@ -2,8 +2,7 @@
 
 #include <functional>
 #include <string>
-// #include <sparsehash/dense_hash_map>
-#include <google/dense_hash_map> //for backwards compatibility with older Linux distros
+#include <sparsehash/dense_hash_map>
 
 namespace wiremap{
     const std::hash<std::string> hashstr;

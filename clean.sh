@@ -5,10 +5,13 @@ case "$1" in
         rm -rf CMakeFiles CMakeCache.txt cmake_install.cmake Makefile;
         ;;
     "wiremap")
-        rm -rf build/* lib/*;
+        rm -rf bin/tests/* bin/benchmarks/* lib/*;
+        ;;
+    "external")
+        rm -rf external/*;
         ;;
     "all")
-        rm -rf CMakeFiles CMakeCache.txt cmake_install.cmake Makefile build/* lib/*;
+        rm -rf CMakeFiles CMakeCache.txt cmake_install.cmake Makefile bin/tests/* bin/benchmarks/* lib/* external;
         ;;
     *)
         printf "Skipping clean. No target specified.\n"

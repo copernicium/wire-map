@@ -8,19 +8,15 @@ before_install:
   - sudo apt-get install gcc-8 g++-8 -y
   - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 90;
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90;
-  - sudo apt-get install sparsehash
-
-install: ./install.sh vcpkg
 
 compiler: g++
-
-stages:
-  - Build
-  # - Test # TODO
 
 jobs:
   include:
     - stage: Build
       script:
-        - cmake . -DCMAKE_TOOLCHAIN_FILE=/vcpkg/scripts/buildsystems/vcpkg.cmake -DBUILD_TYPE=DEBUG #-DTESTING=TRUE -DBENCHMARK=TRUE # TODO
+        - cmake . -DBUILD_TYPE=DEBUG # -DTESTING=TRUE -DBENCHMARKS=TRUE
         - make
+    # - stage: Test
+      # script:
+        # - ./test.sh
