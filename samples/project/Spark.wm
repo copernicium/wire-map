@@ -1,0 +1,7 @@
+Device Spark
+    Parameter List of 10 Bool VoltageIn
+
+    Constant Real Coefficient
+
+    Result Integer Current
+        Output 9

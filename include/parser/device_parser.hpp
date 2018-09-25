@@ -4,6 +4,7 @@
 #include "parser/parameter_parser.hpp"
 #include "parser/constant_parser.hpp"
 #include "parser/result_parser.hpp"
+#include "util.hpp"
 
 namespace wiremap::parser{
     struct DeviceNode{
@@ -13,9 +14,13 @@ namespace wiremap::parser{
         std::vector<ConstantNode> constants;
         std::vector<ResultNode> results;
 
+    private:
         static constexpr std::string_view KEYWORD = "Device";
         static constexpr unsigned KEYWORD_POS = 0;
+        static constexpr unsigned REQUIRED_LINE_SIZE = 2;
 
+    public:
+        static bool identifierIsDevice(const std::vector<std::string>&);
         static DeviceNode parse(const std::vector<std::string>&);
 
         std::string toString()const;
@@ -28,15 +33,15 @@ namespace wiremap::parser{
 
     struct DeviceNodes{
     private:
-        static std::shared_ptr<google::dense_hash_map<detail::KeyType,DeviceNode,detail::Hasher,detail::KeyCompare>> device_nodes;
+        static std::shared_ptr<google::dense_hash_map<wiremap::detail::KeyType,DeviceNode,wiremap::detail::Hasher,wiremap::detail::KeyCompare>> device_nodes;
 
     public:
         static void reset(){
-            device_nodes = std::make_shared<google::dense_hash_map<detail::KeyType,DeviceNode,detail::Hasher,detail::KeyCompare>>();
+            device_nodes = std::make_shared<google::dense_hash_map<wiremap::detail::KeyType,DeviceNode,wiremap::detail::Hasher,wiremap::detail::KeyCompare>>();
             device_nodes->set_empty_key(0);
         }
 
-        static void add(const detail::KeyType& KEY, const DeviceNode& VALUE)noexcept{
+        static void add(const wiremap::detail::KeyType& KEY, const DeviceNode& VALUE)noexcept{
             if(device_nodes == nullptr){
                 reset();
             }
@@ -47,7 +52,7 @@ namespace wiremap::parser{
             add(hashstr(KEY),VALUE);
         }
 
-        static DeviceNode& get(const detail::KeyType& KEY)noexcept{
+        static DeviceNode& get(const wiremap::detail::KeyType& KEY)noexcept{
             assert(device_nodes != nullptr && device_nodes->find(KEY) != device_nodes->end());
             return (*device_nodes)[KEY];
         }
@@ -56,7 +61,7 @@ namespace wiremap::parser{
             return get(hashstr(KEY));
         }
 
-        static bool exists(const detail::KeyType& KEY)noexcept{
+        static bool exists(const wiremap::detail::KeyType& KEY)noexcept{
             if(device_nodes == nullptr){
                 return false;
             }
@@ -80,6 +85,17 @@ namespace wiremap::parser{
             }
             s += "]";
             return s;
+        }
+
+        static void parse(const std::vector<std::string>& LINES){
+            if(LINES.empty() || !DeviceNode::identifierIsDevice(splitLine(LINES[0]))){
+                return;
+            }
+            DeviceNode a = DeviceNode::parse(LINES);
+            if(DeviceNodes::exists(a.name)){
+                exit(EXIT_FAILURE); //TODO error, redefinition
+            }
+            add(a.name,a);
         }
 
         DeviceNodes() = delete;

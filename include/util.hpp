@@ -4,7 +4,6 @@
 #include <type_traits>
 #include <tuple>
 
-
 #define NYI { \
     printf("NYI %s:%d\n", __FILE__, __LINE__); \
     exit(EXIT_FAILURE);                        \

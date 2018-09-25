@@ -1,0 +1,3 @@
+Spark spark1
+    VoltageIn <- batt1.Voltage
+    Coefficient = 7

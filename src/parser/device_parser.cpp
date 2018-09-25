@@ -6,9 +6,12 @@
 #include <string_view>
 
 namespace wiremap::parser{
+    bool DeviceNode::identifierIsDevice(const std::vector<std::string>& LINE){
+        return LINE.size() == REQUIRED_LINE_SIZE && LINE[KEYWORD_POS] == KEYWORD;
+    }
 
     std::string parseDeviceName(const std::vector<std::string>& LINE){
-        if(LINE.size() == 2 && LINE[DeviceNode::KEYWORD_POS] == DeviceNode::KEYWORD){
+        if(DeviceNode::identifierIsDevice(LINE)){
             return {LINE[1]};
         }
         assert(0);

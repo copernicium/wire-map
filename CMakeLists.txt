@@ -58,9 +58,12 @@ ADD_LIBRARY(parser SHARED
   src/parser/constant_parser.cpp
   src/parser/result_parser.cpp
   src/parser/device_parser.cpp
-  src/parser/parser.cpp)
+  src/parser/wiremap_parser.cpp
+  src/parser/project_parser.cpp)
 
 ADD_DEPENDENCIES(parser sparsehash)
+
+TARGET_LINK_LIBRARIES(parser stdc++fs)
 
 # Wire-Map Library
 

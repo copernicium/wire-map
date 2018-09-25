@@ -73,7 +73,7 @@ CIM cim1
 
 CIM cim2
     Current <- spark1.Current
-    Coefficient1 = 3
+    Coefficient1 = 3                                             # TODO determine how this works for arrays and collections
     Coefficient2 = 5
 
 Battery batt1
