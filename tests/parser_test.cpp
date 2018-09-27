@@ -15,7 +15,9 @@ TEST(ParserTest, DeviceTest){
         {
             {"Coefficient",{Type::PrimitiveType::REAL}, {}}
         },
-        {}
+        {
+            {"Current",{Type::PrimitiveType::INTEGER}}
+        }
     };
     EXPECT_EQ(DeviceNodes::get("Spark"), expected);
     DeviceNodes::reset();

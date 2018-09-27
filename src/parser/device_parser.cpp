@@ -40,6 +40,7 @@ namespace wiremap::parser{
                 } else if(split_line.front() == ConstantNode::KEYWORD){
                     device_node.constants.push_back(ConstantNode::parse(split_line));
                 } else if(split_line.front() == ResultNode::KEYWORD){
+                    device_node.results.push_back(ResultNode::parse(split_line));//TODO not split line but scope
                 } else {
                     NYI
                 }

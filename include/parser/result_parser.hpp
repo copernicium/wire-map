@@ -10,8 +10,8 @@ namespace wiremap::parser{
 
         static constexpr std::string_view KEYWORD = "Result";
 
-        ResultNode parse(const std::vector<std::string>&);
-        ResultNode parse(const std::string&);
+        static ResultNode parse(const std::vector<std::string>&);
+        static ResultNode parse(const std::string&);
 
         ResultNode();
         ResultNode(const std::string&, const Type&);
