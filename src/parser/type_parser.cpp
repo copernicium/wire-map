@@ -5,7 +5,7 @@
 #include "parser/alias_parser.hpp"
 #include "parser/util.hpp"
 #include "util.hpp"
-#include <iostream>
+
 namespace wiremap::parser{
     std::string asString(const Type::BaseType& IN){
         switch(IN){

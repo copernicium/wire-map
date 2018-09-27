@@ -6,8 +6,6 @@
 #include "util.hpp"
 #include <fstream>
 
-#include <iostream>
-
 namespace wiremap::parser{
     std::vector<std::string> readFile(const std::filesystem::path& FILE){
         std::ifstream file_stream(FILE, std::ifstream::in);
