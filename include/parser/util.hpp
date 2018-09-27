@@ -31,4 +31,9 @@ namespace wiremap::parser{
     }
 
     std::vector<std::string> captureScope(const std::vector<std::string>&, unsigned scope_start = 0);
+
+    template<typename T>
+    std::vector<T> subvector(const std::vector<T>& SOURCE, const unsigned& START, const unsigned& END){
+        return std::vector<T>{SOURCE.begin() + START, SOURCE.begin() + END};
+    }
 }

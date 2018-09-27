@@ -46,7 +46,7 @@ namespace wiremap::parser{
                 reset();
             }
             assert(!exists(KEY));
-            aliases->insert(std::make_pair(KEY, VALUE));
+            (*aliases)[KEY] = VALUE;
         }
 
         static void add(const std::string& KEY, const Type& VALUE)noexcept{

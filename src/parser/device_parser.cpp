@@ -34,7 +34,7 @@ namespace wiremap::parser{
                 continue;
             }
             std::vector<std::string> split_line = splitLine(IN[i]);
-            if(!split_line.empty()){
+            if(!split_line.empty()){ //TODO all names must be unique within device
                 if(split_line.front() == ParameterNode::KEYWORD){
                     device_node.parameters.push_back(ParameterNode::parse(split_line));
                 } else if(split_line.front() == ConstantNode::KEYWORD){

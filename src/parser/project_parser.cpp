@@ -54,8 +54,9 @@ namespace wiremap::parser{
             if(a.is_regular_file()){
                 if(a.path().stem() == PROJECT_MAIN_FILE_NAME){
                     main_file = a;
+                } else {
+                    parseFile(a);
                 }
-                parseFile(a);
             }
         }
         if(main_file.has_value()){

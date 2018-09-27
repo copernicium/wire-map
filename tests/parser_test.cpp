@@ -10,10 +10,10 @@ TEST(ParserTest, DeviceTest){
     DeviceNode expected = {
         "Spark",
         {
-            {"VoltageIn",{Type::UnderlyingType::BOOL,10}, {}, {}}
+            {"VoltageIn",{std::make_pair(std::make_shared<Type>(Type::PrimitiveType::BOOL),10)}, {}, {}}
         },
         {
-            {"Coefficient",{Type::UnderlyingType::REAL}, {}}
+            {"Coefficient",{Type::PrimitiveType::REAL}, {}}
         },
         {}
     };
@@ -28,7 +28,7 @@ TEST(ParserTest, AliasTest){
         "Person",
         {},
         {
-            {"Contact",{Type::UnderlyingType::INTEGER, 10}, {}}
+            {"Contact",{std::make_pair(std::make_shared<Type>(Type::PrimitiveType::INTEGER), 10)}, {}}
         },
         {}
     };

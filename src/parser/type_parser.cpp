@@ -5,7 +5,7 @@
 #include "parser/alias_parser.hpp"
 #include "parser/util.hpp"
 #include "util.hpp"
-
+#include <iostream>
 namespace wiremap::parser{
     std::string asString(const Type::BaseType& IN){
         switch(IN){
@@ -13,133 +13,160 @@ namespace wiremap::parser{
             return "\"List\"";
         case Type::BaseType::COLLECTION:
             return "\"Collection\"";
-        case Type::BaseType::OBJECT:
-            return "\"Object\"";
+        case Type::BaseType::PRIMITIVE:
+            return "\"Primitive\"";
         default:
             NYI
         }
     }
 
-    std::string asString(const Type::UnderlyingType& IN){
+    std::string asString(const Type::PrimitiveType& IN){
         switch(IN){
-        case Type::UnderlyingType::BIT:
+        case Type::PrimitiveType::BIT:
             return "\"Bit\"";
-        case Type::UnderlyingType::CHAR:
+        case Type::PrimitiveType::CHAR:
             return "\"Char\"";
-        case Type::UnderlyingType::BYTE:
+        case Type::PrimitiveType::BYTE:
             return "\"Byte\"";
-        case Type::UnderlyingType::WORD:
+        case Type::PrimitiveType::WORD:
             return "\"Word\"";
-        case Type::UnderlyingType::DWORD:
+        case Type::PrimitiveType::DWORD:
             return "\"DWord\"";
-        case Type::UnderlyingType::QWORD:
+        case Type::PrimitiveType::QWORD:
             return "\"QWord\"";
-        case Type::UnderlyingType::INTEGER:
+        case Type::PrimitiveType::INTEGER:
             return "\"Integer\"";
-        case Type::UnderlyingType::BOOL:
+        case Type::PrimitiveType::BOOL:
             return "\"Bool\"";
-        case Type::UnderlyingType::REAL:
+        case Type::PrimitiveType::REAL:
             return "\"Real\"";
         default:
             NYI
         }
     }
 
-    Type::UnderlyingType parseUnderlyingType(const std::string& IN){
+    Type::PrimitiveType parsePrimitiveType(const std::string& IN){
         if(IN == "Bit"){
-            return Type::UnderlyingType::BIT;
+            return Type::PrimitiveType::BIT;
         } else if(IN == "Char"){
-            return Type::UnderlyingType::CHAR;
+            return Type::PrimitiveType::CHAR;
         } else if(IN == "Byte"){
-            return Type::UnderlyingType::BYTE;
+            return Type::PrimitiveType::BYTE;
         } else if(IN == "Word"){
-            return Type::UnderlyingType::WORD;
+            return Type::PrimitiveType::WORD;
         } else if(IN == "DWord"){
-            return Type::UnderlyingType::DWORD;
+            return Type::PrimitiveType::DWORD;
         } else if(IN == "QWord"){
-            return Type::UnderlyingType::QWORD;
+            return Type::PrimitiveType::QWORD;
         } else if(IN == "Integer"){
-            return Type::UnderlyingType::INTEGER;
+            return Type::PrimitiveType::INTEGER;
         } else if(IN == "Bool"){
-            return Type::UnderlyingType::BOOL;
+            return Type::PrimitiveType::BOOL;
         } else if(IN == "Real"){
-            return Type::UnderlyingType::REAL;
+            return Type::PrimitiveType::REAL;
         }
         printf("IN:%s\n",IN.c_str());
         NYI
     }
 
-    Type Type::parseObject(const std::string& UNDERLYING_TYPE){
+    Type Type::parseObject(const std::string& PRIMITIVE_TYPE){
         Type type;
-        type.base_type = BaseType::OBJECT;
-        type.underlying_types = {parseUnderlyingType(UNDERLYING_TYPE)};
+        type.base_type = BaseType::PRIMITIVE;
+        type.underlying_type = parsePrimitiveType(PRIMITIVE_TYPE);
         return type;
     }
 
     Type Type::parseList(const std::vector<std::string>& IN){
+        assert(isList(IN));
+
         Type type;
         type.base_type = BaseType::LIST;
-        for(const auto& a: IN){
-            if(a != LIST_KEYWORD && a != CONTAINER_TYPE_SPECIFIER){
-                if(isNumber(a)){
-                    type.list_size = std::stoi(a);
-                    continue;
-                }
-                type.underlying_types.push_back(parseUnderlyingType(a));
-            }
-        }
-        assert(type.underlying_types.size() == 1);
+        type.underlying_type = UnderlyingListType{
+            std::make_shared<Type>(
+                Type::parse(subvector(IN, LIST_SIZE_POS + 1, IN.size()))
+            ),
+            std::stoi(IN[LIST_SIZE_POS])
+        };
         return type;
     }
 
     Type Type::parseCollection(const std::vector<std::string>& IN){
+        assert(isCollection(IN));
+
         Type type;
         type.base_type = BaseType::COLLECTION;
-        for(const auto& a: IN){
-            if(a != COLLECTION_KEYWORD && a != CONTAINER_TYPE_SPECIFIER){
-                if(isNumber(a)){
-                    type.list_size = std::stoi(a);
-                    continue;
-                }
-                type.underlying_types.push_back(parseUnderlyingType(a));
+        type.underlying_type = UnderlyingCollectionType();
+        unsigned start = CONTAINER_SPECIFIER_POS + 1;
+        for(unsigned i = start; i < IN.size(); i++){
+            if(IN[i] == COLLECTION_SEPARATOR){
+                std::get<UnderlyingCollectionType>(type.underlying_type).push_back(
+                    std::make_shared<Type>(
+                        Type::parse(subvector(IN, start, i))
+                    )
+                );
+                start = i + 1;
             }
         }
+        std::get<UnderlyingCollectionType>(type.underlying_type).push_back( //capture last type in collection
+            std::make_shared<Type>(
+                Type::parse(subvector(IN, start, IN.size()))
+            )
+        );
         return type;
     }
 
     Type::BaseType Type::getBaseType()const{
-        return base_type;
+        return base_type; //TODO replace with type check on underlying_type?
     }
 
-    Type::UnderlyingType Type::getUnderlyingType()const{
-        assert(base_type != BaseType::COLLECTION && !underlying_types.empty());
-        return underlying_types.front();
-    }
-
-    std::vector<Type::UnderlyingType> Type::getUnderlyingTypes()const{
-        assert(base_type == BaseType::COLLECTION);
-        return underlying_types;
+    Type::PrimitiveType Type::getObjectType()const{
+        assert(base_type == BaseType::PRIMITIVE);
+        return std::get<PrimitiveType>(underlying_type);
     }
 
     unsigned Type::getListSize()const{
         assert(base_type == BaseType::LIST);
-        return list_size;
+        return std::get<UnderlyingListType>(underlying_type).second;
     }
 
-    Type Type::parse(const std::vector<std::string>& in){
-        assert(!in.empty());
+    Type Type::getListType()const{
+        assert(base_type == BaseType::LIST);
+        assert(std::get<UnderlyingListType>(underlying_type).first != nullptr);
+        return *(std::get<UnderlyingListType>(underlying_type).first);
+    }
+
+    std::vector<Type> Type::getCollectionTypes()const{
+        assert(base_type == BaseType::COLLECTION);
+        std::vector<Type> v;
+        for(const std::shared_ptr<Type>& a: std::get<UnderlyingCollectionType>(underlying_type)){
+            assert(a != nullptr);
+            v.push_back(*a);
+        }
+        return v;
+    }
+
+    bool Type::isList(const std::vector<std::string>& IN){
+        return IN.size() > LIST_SIZE_POS && IN[CONTAINER_KEYWORD_POS] == LIST_KEYWORD && IN[CONTAINER_SPECIFIER_POS] == CONTAINER_TYPE_SPECIFIER && isNumber(IN[LIST_SIZE_POS]);
+    }
+
+    bool Type::isCollection(const std::vector<std::string>& IN){
+        return IN.size() > CONTAINER_SPECIFIER_POS && IN[CONTAINER_KEYWORD_POS] == COLLECTION_KEYWORD && IN[CONTAINER_SPECIFIER_POS] == CONTAINER_TYPE_SPECIFIER;
+    }
+
+    Type Type::parse(const std::vector<std::string>& IN){
+        assert(!IN.empty());
 
         Type type;
 
-        if(in.front() == COLLECTION_KEYWORD){
-            type = Type::parseCollection(in);
-        } else if(in.front() == LIST_KEYWORD){
-            type = Type::parseList(in);
+        if(isCollection(IN)){
+            type = Type::parseCollection(IN);
+        } else if(isList(IN)){
+            type = Type::parseList(IN);
         } else {
-            if(AliasMap::exists(in.front())){
-                return AliasMap::get(in.front());
+            if(AliasMap::exists(IN.front())){
+                return AliasMap::get(IN.front());
             }
-            type = Type::parseObject(in.front());
+            type = Type::parseObject(IN.front());
         }
 
         return type;
@@ -152,24 +179,76 @@ namespace wiremap::parser{
     std::string Type::toString()const{
         std::string a = "{";
         a += "\"base_type\":" + asString(getBaseType()) + ", ";
-        if(base_type == BaseType::LIST){
-            a += "\"list_size\":" + std::to_string(getListSize()) + ", ";
-        }
-        if(base_type != BaseType::COLLECTION){
-            a += "\"underlying_type\":" + asString(getUnderlyingType());
-        } else {
-            a += "\"underlying_types\":" + asString(getUnderlyingTypes(), static_cast<std::string(*)(const Type::UnderlyingType&)>(asString));
+        switch(base_type){
+        case BaseType::LIST:
+            a += "\"underlying_type\":" + getListType().toString() + ", ";
+            a += "\"list_size\":" + std::to_string(getListSize());
+            break;
+        case BaseType::COLLECTION:
+            a += "\"underlying_type\":" + asString(getCollectionTypes(), &Type::toString);
+            break;
+        case BaseType::PRIMITIVE:
+            a += "\"underlying_type\":" + asString(getObjectType());
+            break;
+        default:
+            NYI
         }
         a += "}";
         return a;
     }
 
     Type::Type(){}
-    Type::Type(const UnderlyingType& U): base_type(Type::BaseType::OBJECT), underlying_types({U}){}
-    Type::Type(const UnderlyingType& U, const unsigned& LEN): base_type(Type::BaseType::LIST), underlying_types({U}), list_size(LEN){}
-    Type::Type(const std::vector<UnderlyingType>& U):base_type(Type::BaseType::COLLECTION), underlying_types(U){}
+    Type::Type(const PrimitiveType& U): base_type(Type::BaseType::PRIMITIVE), underlying_type(U){}
+    Type::Type(const UnderlyingListType& U): base_type(Type::BaseType::LIST), underlying_type(U){}
+    Type::Type(const UnderlyingCollectionType& U): base_type(Type::BaseType::COLLECTION), underlying_type(U){}
 
     bool operator==(const Type& a, const Type& b){
-        return a.base_type == b.base_type && a.underlying_types == b.underlying_types;
+        if(a.base_type != b.base_type){
+            return false;
+        }
+        if(a.underlying_type.index() != b.underlying_type.index()){
+            return false;
+        }
+        switch(a.base_type){
+        case Type::BaseType::PRIMITIVE:
+            return a.underlying_type == b.underlying_type;
+        case Type::BaseType::LIST:
+        {
+            Type::UnderlyingListType a_under = std::get<Type::UnderlyingListType>(a.underlying_type);
+            Type::UnderlyingListType b_under = std::get<Type::UnderlyingListType>(b.underlying_type);
+            if(a_under.second != b_under.second){
+                return false;
+            }
+            if(a_under.first != nullptr && b_under.first != nullptr){
+                return *a_under.first == *b_under.first;
+            }
+            return a_under.first == b_under.first;
+        }
+        case Type::BaseType::COLLECTION:
+        {
+            Type::UnderlyingCollectionType a_under = std::get<Type::UnderlyingCollectionType>(a.underlying_type);
+            Type::UnderlyingCollectionType b_under = std::get<Type::UnderlyingCollectionType>(b.underlying_type);
+            if(a_under.size() != b_under.size()){
+                return false;
+            }
+            for(unsigned i = 0; i < a_under.size(); i++){
+                if(a_under[i] != nullptr && b_under[i] != nullptr &&
+                   *(a_under[i]) != *(b_under[i])
+                ){
+                    return false;
+                }
+                if(a_under[i] != b_under[i]){
+                    return false;
+                }
+            }
+            return true;
+        }
+        default:
+            NYI
+        }
+    }
+
+    bool operator!=(const Type& a, const Type& b){
+        return !(a == b);
     }
 }

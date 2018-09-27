@@ -3,13 +3,61 @@
 ########## RoboRIO.wm (device definition file)
 
 Device RoboRIO
+    Parameter List of 10 List of 5 Bool Board
+
+    Parameter Collection of List of 10 Bool, Real Board2
+
     Result Real PWM1
         Output 5
 
 # Parsed into DeviceNode
 # {
 #     name: "RoboRIO",
-#     parameters: [],
+#     parameters: [
+#         {
+#             name: "Board",
+#             type: {
+#                 base_type: LIST,
+#                 underlying_types: [
+#                     {
+#                         base_type: LIST,
+#                         underlying_types: [BOOL],
+#                         list_size: 5
+#                     }
+#                 ],
+#                 list_size: 10
+#             },
+#             source_device: NULL,
+#             source_result: NULL
+#         },
+#         {
+#             name: "Board2",
+#             type: {
+#                 base_type: COLLECTION,
+#                 underlying_types: [
+#                     {
+#                         base_type: LIST,
+#                         underlying_types: [
+#                             {
+#                                 base_type: OBJECT
+#                                 underlying_types: [BOOL]
+#                                 list_size: 0
+#                             }
+#                         ],
+#                         list_size: 5
+#                     },
+#                     {
+#                         base_type: OBJECT,
+#                         underlying_types: [REAL],
+#                         list_size: 0
+#                     }
+#                 ],
+#                 list_size: 0
+#             },
+#             source_device: NULL,
+#             source_result: NULL
+#         }
+#     ],
 #     constants: [],
 #     Results: [
 #          {

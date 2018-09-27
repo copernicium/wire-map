@@ -9,7 +9,7 @@ namespace wiremap::parser{
 
         ConstantNode constant_node;
         constant_node.name = split_line[split_line.size() - 1];
-        constant_node.type = Type::parse(std::vector<std::string>{split_line.begin() + 1, split_line.end() - 1});
+        constant_node.type = Type::parse(subvector(split_line, 1, split_line.size() - 1));
 
         return constant_node;
     }

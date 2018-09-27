@@ -7,10 +7,13 @@ namespace wiremap::parser{
         std::string a;
         for(unsigned i = 0; i < LINE.size(); i++){
             const char& c = LINE[i];
-            if(c == ' ' || (c == ',' && (i + 1) < LINE.size() && LINE[i + 1] == ' ')){ //TODO split at ( and ) ?
+            if(c == ' ' || c == ','){ //TODO split at ( and ) ?
                 if(!a.empty()){
                     v.push_back(a);
                     a = "";
+                }
+                if(c == ','){
+                    v.push_back(",");
                 }
             } else if(c == detail::COMMENT_START){
                 break;
@@ -57,6 +60,6 @@ namespace wiremap::parser{
                 break;
             }
         }
-        return std::vector<std::string>{LINES.begin() + scope_start, LINES.begin() + scope_end};
+        return subvector(LINES, scope_start, scope_end);
     }
 }
