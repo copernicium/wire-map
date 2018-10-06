@@ -8,19 +8,25 @@
 
 namespace wiremap::parser{
     struct DeviceNode{
+    private:
         std::string name;
 
         std::vector<ParameterNode> parameters;
         std::vector<ConstantNode> constants;
         std::vector<ResultNode> results;
 
-    private:
-        static constexpr std::string_view KEYWORD = "Device";
+		static constexpr std::string_view KEYWORD = "Device";
         static constexpr unsigned KEYWORD_POS = 0;
         static constexpr unsigned REQUIRED_LINE_SIZE = 2;
 
     public:
-        static bool identifierIsDevice(const std::vector<std::string>&);
+		std::string getName()const;
+
+		std::vector<ParameterNode> getParameters()const;
+		std::vector<ConstantNode> getConstants()const;
+		std::vector<ResultNode> getResults()const;
+
+        static bool identify(const std::vector<std::string>&);
         static DeviceNode parse(const std::vector<std::string>&);
 
         std::string toString()const;
@@ -88,14 +94,14 @@ namespace wiremap::parser{
         }
 
         static void parse(const std::vector<std::string>& LINES){
-            if(LINES.empty() || !DeviceNode::identifierIsDevice(splitLine(LINES[0]))){
+            if(LINES.empty() || !DeviceNode::identify(splitLine(LINES[0]))){
                 return;
             }
             DeviceNode a = DeviceNode::parse(LINES);
-            if(DeviceNodes::exists(a.name)){
+            if(DeviceNodes::exists(a.getName())){
                 exit(EXIT_FAILURE); //TODO error, redefinition
             }
-            add(a.name,a);
+            add(a.getName(),a);
         }
 
         DeviceNodes() = delete;

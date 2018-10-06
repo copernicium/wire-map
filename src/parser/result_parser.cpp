@@ -4,6 +4,18 @@
 #include <cassert>
 
 namespace wiremap::parser{
+	std::string ResultNode::getName()const{
+		return name;
+	}
+
+	Type ResultNode::getType()const{
+		return type;
+	}
+
+	bool ResultNode::identify(const std::vector<std::string>& LINE){
+		return LINE.size() >= 3 && LINE.front() == KEYWORD;
+	}
+
     ResultNode ResultNode::parse(const std::vector<std::string>& split_line){
         assert(split_line.size() >= 3);
 
@@ -31,6 +43,6 @@ namespace wiremap::parser{
     ResultNode::ResultNode(const std::string& NAME, const Type& TYPE): name(NAME), type(TYPE){}
 
     bool operator==(const ResultNode& a, const ResultNode& b){
-        return a.name == b.name && a.type == b.type;
+        return a.getName() == b.getName() && a.getType() == b.getType();
     }
 }

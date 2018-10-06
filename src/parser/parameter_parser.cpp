@@ -4,7 +4,27 @@
 #include <cassert>
 
 namespace wiremap::parser{
-    ParameterNode ParameterNode::parse(const std::vector<std::string>& split_line){
+	std::string ParameterNode::getName()const{
+		return name;
+	}
+
+	Type ParameterNode::getType()const{
+		return type;
+	}
+
+	std::optional<std::string> ParameterNode::getSourceDevice()const{
+		return source_device;
+	}
+
+	std::optional<std::string> ParameterNode::getSourceResult()const{
+		return source_result;
+	}
+
+	bool ParameterNode::identify(const std::vector<std::string>& LINE){
+		return LINE.size() >= 3 && LINE.front() == KEYWORD;
+	}
+
+	ParameterNode ParameterNode::parse(const std::vector<std::string>& split_line){
         assert(split_line.size() >= 3);
 
         ParameterNode parameter_node;
@@ -32,6 +52,6 @@ namespace wiremap::parser{
     ParameterNode::ParameterNode(const std::string& NAME, const Type& TYPE, const std::optional<std::string>& SD, const std::optional<std::string>& SR): name(NAME), type(TYPE), source_device(SD), source_result(SR){}
 
     bool operator==(const ParameterNode& a, const ParameterNode& b){
-        return a.name == b.name && a.type == b.type && a.source_device == b.source_device && a.source_result == b.source_result;
+        return a.getName() == b.getName() && a.getType() == b.getType() && a.getSourceDevice() == b.getSourceDevice() && a.getSourceResult() == b.getSourceResult();
     }
 }

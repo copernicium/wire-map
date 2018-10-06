@@ -2,7 +2,6 @@
 
 #include <string_view>
 
-#include "parser/alias_parser.hpp"
 #include "parser/util.hpp"
 #include "util.hpp"
 
@@ -163,8 +162,8 @@ namespace wiremap::parser{
         } else if(isList(IN)){
             type = Type::parseList(IN);
         } else {
-            if(AliasMap::exists(IN.front())){
-                return AliasMap::get(IN.front());
+            if(TypeMap::exists(IN.front())){
+                return TypeMap::get(IN.front());
             }
             type = Type::parseObject(IN.front());
         }

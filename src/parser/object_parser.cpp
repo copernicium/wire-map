@@ -3,7 +3,7 @@
 #include "parser/util.hpp"
 
 namespace wiremap::parser{
-    std::optional<ObjectNode> parseObject(const std::string& LINE){
+    ObjectNode ObjectNode::parse(const std::string& LINE){
         std::vector<std::string> split_line = splitLine(LINE);
 
         if(split_line.size() < 2){
@@ -14,6 +14,6 @@ namespace wiremap::parser{
         object_node.name = split_line[1];
         object_node.type = Type::parse(subvector(split_line, 0, split_line.size() - 1));
 
-        return {object_node};
+        return object_node;
     }
 }

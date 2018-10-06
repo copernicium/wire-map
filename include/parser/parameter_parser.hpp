@@ -4,6 +4,7 @@
 
 namespace wiremap::parser{
     struct ParameterNode{
+	private:
         std::string name;
 
         Type type;
@@ -14,12 +15,25 @@ namespace wiremap::parser{
 
         static constexpr std::string_view KEYWORD = "Parameter";
 
+	public:
+		std::string getName()const;
+
+		Type getType()const;
+
+		std::optional<std::string> getSourceDevice()const;
+
+		std::optional<std::string> getSourceResult()const;
+
+		static bool identify(const std::vector<std::string>&);
+
         static ParameterNode parse(const std::vector<std::string>&);
+
         static ParameterNode parse(const std::string&);
 
         std::string toString()const;
 
         ParameterNode();
+
         ParameterNode(const std::string&, const Type&, const std::optional<std::string>&, const std::optional<std::string>&);
     };
 

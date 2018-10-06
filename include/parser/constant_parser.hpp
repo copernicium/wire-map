@@ -4,7 +4,8 @@
 
 namespace wiremap::parser{
     struct ConstantNode{
-        std::string name;
+	private:
+		std::string name;
 
         Type type;
 
@@ -12,7 +13,17 @@ namespace wiremap::parser{
 
         static constexpr std::string_view KEYWORD = "Constant";
 
+	public:
+		std::string getName()const;
+
+		Type getType()const;
+
+		std::optional<std::string> getValue()const;
+
+		static bool identify(const std::vector<std::string>&);
+
         static ConstantNode parse(const std::vector<std::string>&);
+
         static ConstantNode parse(const std::string&);
 
         ConstantNode();

@@ -1,0 +1,13 @@
+RoboRio roborio
+
+Battery battery
+
+PDP pdp
+    VoltageIn <- battery.VoltageOut
+
+Spark spark
+    VoltageIn <- pdp.Channel0
+    PulseIn <- roborio.PWM1
+	PulseMin = 1000
+	PulseNeutral = 1500
+	PulseMax = 2000

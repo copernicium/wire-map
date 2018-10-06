@@ -39,7 +39,7 @@ TEST(ParserTest, AliasTest){
 }
 
 TEST(ParserTest, ProjectTest){
-    Project::parse("samples/project/");
+    Project::parse("samples/simple-frc/");
     std::cout<<"\"DeviceNodes\":"<<DeviceNodes::toString()<<"\n";
     EXPECT_EQ(0, 0); //TODO
     DeviceNodes::reset();

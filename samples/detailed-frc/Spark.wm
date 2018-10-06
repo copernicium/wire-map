@@ -1,0 +1,18 @@
+Device Spark
+    Parameter Real VoltageIn
+
+    Parameter Integer PulseIn # Pulse measured in microseconds
+
+	Constant Integer PulseMin
+
+	Constant Integer PulseNeutral
+
+	Constant Inteeger PulseMax
+
+	Result Real DutyCycle
+	    if PulseIn > PulseNeutral
+            Output (PulseIn - PulseNeutral + 40) / (PulseMax - PulseNeutral + 40)
+		Output (PulseNeutral - 40 - PulseIn) / (PulseNeutral - 40 - PulseMin)
+
+    Result Real VoltageOut
+	    Output VoltageIn * DutyCycle

@@ -6,12 +6,27 @@
 #include <string_view>
 
 namespace wiremap::parser{
-    bool DeviceNode::identifierIsDevice(const std::vector<std::string>& LINE){
+	std::string DeviceNode::getName()const{
+		return name;
+	}
+
+	std::vector<ParameterNode> DeviceNode::getParameters()const{
+		return parameters;
+	}
+
+	std::vector<ConstantNode> DeviceNode::getConstants()const{
+		return constants;
+	}
+	std::vector<ResultNode> DeviceNode::getResults()const{
+		return results;
+	}
+
+    bool DeviceNode::identify(const std::vector<std::string>& LINE){
         return LINE.size() == REQUIRED_LINE_SIZE && LINE[KEYWORD_POS] == KEYWORD;
     }
 
     std::string parseDeviceName(const std::vector<std::string>& LINE){
-        if(DeviceNode::identifierIsDevice(LINE)){
+        if(DeviceNode::identify(LINE)){
             return {LINE[1]};
         }
         assert(0);
@@ -35,11 +50,11 @@ namespace wiremap::parser{
             }
             std::vector<std::string> split_line = splitLine(IN[i]);
             if(!split_line.empty()){ //TODO all names must be unique within device
-                if(split_line.front() == ParameterNode::KEYWORD){
+                if(ParameterNode::identify(split_line)){
                     device_node.parameters.push_back(ParameterNode::parse(split_line));
-                } else if(split_line.front() == ConstantNode::KEYWORD){
+                } else if(ConstantNode::identify(split_line)){
                     device_node.constants.push_back(ConstantNode::parse(split_line));
-                } else if(split_line.front() == ResultNode::KEYWORD){
+                } else if(ResultNode::identify(split_line)){
                     device_node.results.push_back(ResultNode::parse(split_line));//TODO not split line but scope
                 } else {
                     NYI
@@ -63,6 +78,6 @@ namespace wiremap::parser{
     DeviceNode::DeviceNode(const std::string& NAME, const std::vector<ParameterNode>& P, const std::vector<ConstantNode>& C, const std::vector<ResultNode>& R): name(NAME), parameters(P), constants(C), results(R){}
 
     bool operator==(const DeviceNode& a, const DeviceNode& b){
-        return a.name == b.name && a.parameters == b.parameters && a.constants == b.constants && a.results == b.results;
+        return a.getName() == b.getName() && a.getParameters() == b.getParameters() && a.getConstants() == b.getConstants() && a.getResults() == b.getResults();
     }
 }
