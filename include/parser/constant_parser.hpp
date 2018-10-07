@@ -27,6 +27,7 @@ namespace wiremap::parser{
         static ConstantNode parse(const std::string&);
 
         ConstantNode();
+
         ConstantNode(const std::string&, const Type&, const std::optional<std::string>&);
 
         std::string toString()const;

@@ -17,6 +17,7 @@ namespace wiremap::parser{
 	std::vector<ConstantNode> DeviceNode::getConstants()const{
 		return constants;
 	}
+
 	std::vector<ResultNode> DeviceNode::getResults()const{
 		return results;
 	}
@@ -25,37 +26,30 @@ namespace wiremap::parser{
         return LINE.size() == REQUIRED_LINE_SIZE && LINE[KEYWORD_POS] == KEYWORD;
     }
 
-    std::string parseDeviceName(const std::vector<std::string>& LINE){
-        if(DeviceNode::identify(LINE)){
-            return {LINE[1]};
-        }
-        assert(0);
-    }
-
-    DeviceNode DeviceNode::parse(const std::vector<std::string>& IN){
-        assert(!IN.empty());
-
-        constexpr unsigned DEVICE_START_LINE = 0;
+    DeviceNode DeviceNode::parse(const std::vector<std::string>& SCOPE){
+        assert(!SCOPE.empty() && identify(splitLine(SCOPE.front())));
 
         DeviceNode device_node;
-        device_node.name = parseDeviceName(splitLine(IN[DEVICE_START_LINE]));
+        device_node.name = splitLine(SCOPE.front())[1];
 
-        for(unsigned i = DEVICE_START_LINE + 1; i < IN.size(); i++){
-            unsigned indent_count = indentCount(IN[i]);
-            if(indent_count != 1 && !IN[i].empty()){
+        for(unsigned i = 1; i < SCOPE.size(); i++){ // skip first line (name)
+            unsigned indent_count = indentCount(SCOPE[i]);
+            if(indent_count != 1 && !SCOPE[i].empty()){
                 if(indent_count == 0){ //end of device definition
                     break;
                 }
                 continue;
             }
-            std::vector<std::string> split_line = splitLine(IN[i]);
-            if(!split_line.empty()){ //TODO all names must be unique within device
-                if(ParameterNode::identify(split_line)){
-                    device_node.parameters.push_back(ParameterNode::parse(split_line));
-                } else if(ConstantNode::identify(split_line)){
-                    device_node.constants.push_back(ConstantNode::parse(split_line));
-                } else if(ResultNode::identify(split_line)){
-                    device_node.results.push_back(ResultNode::parse(split_line));//TODO not split line but scope
+
+            std::vector<std::string> line = splitLine(SCOPE[i]);
+
+			if(!line.empty()){ //TODO all names must be unique within device
+                if(ParameterNode::identify(line)){
+                    device_node.parameters.push_back(ParameterNode::parse(line));
+                } else if(ConstantNode::identify(line)){
+                    device_node.constants.push_back(ConstantNode::parse(line));
+                } else if(ResultNode::identify(line)){
+                    device_node.results.push_back(ResultNode::parse(line));//TODO not split line but scope
                 } else {
                     NYI
                 }
@@ -75,6 +69,7 @@ namespace wiremap::parser{
     }
 
     DeviceNode::DeviceNode(){}
+
     DeviceNode::DeviceNode(const std::string& NAME, const std::vector<ParameterNode>& P, const std::vector<ConstantNode>& C, const std::vector<ResultNode>& R): name(NAME), parameters(P), constants(C), results(R){}
 
     bool operator==(const DeviceNode& a, const DeviceNode& b){

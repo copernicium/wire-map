@@ -21,15 +21,15 @@ namespace wiremap::parser{
 	}
 
 	bool ParameterNode::identify(const std::vector<std::string>& LINE){
-		return LINE.size() >= 3 && LINE.front() == KEYWORD;
+		return LINE.size() >= MIN_DECLARATION_TERMS && LINE.front() == KEYWORD;
 	}
 
-	ParameterNode ParameterNode::parse(const std::vector<std::string>& split_line){
-        assert(split_line.size() >= 3);
+	ParameterNode ParameterNode::parse(const std::vector<std::string>& LINE){
+        assert(identify(LINE));
 
         ParameterNode parameter_node;
-        parameter_node.name = split_line[split_line.size() - 1];
-        parameter_node.type = Type::parse(subvector(split_line, 1, split_line.size() - 1));
+        parameter_node.name = LINE[LINE.size() - 1];
+        parameter_node.type = Type::parse(subvector(LINE, 1, LINE.size() - 1));
 
         return parameter_node;
     }
@@ -49,6 +49,7 @@ namespace wiremap::parser{
     }
 
     ParameterNode::ParameterNode(){}
+
     ParameterNode::ParameterNode(const std::string& NAME, const Type& TYPE, const std::optional<std::string>& SD, const std::optional<std::string>& SR): name(NAME), type(TYPE), source_device(SD), source_result(SR){}
 
     bool operator==(const ParameterNode& a, const ParameterNode& b){

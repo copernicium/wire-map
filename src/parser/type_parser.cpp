@@ -69,24 +69,18 @@ namespace wiremap::parser{
     }
 
     Type Type::parseObject(const std::string& PRIMITIVE_TYPE){
-        Type type;
-        type.base_type = BaseType::PRIMITIVE;
-        type.underlying_type = parsePrimitiveType(PRIMITIVE_TYPE);
-        return type;
+        return Type(parsePrimitiveType(PRIMITIVE_TYPE));
     }
 
     Type Type::parseList(const std::vector<std::string>& IN){
         assert(isList(IN));
 
-        Type type;
-        type.base_type = BaseType::LIST;
-        type.underlying_type = UnderlyingListType{
+        return Type(UnderlyingListType{
             std::make_shared<Type>(
                 Type::parse(subvector(IN, LIST_SIZE_POS + 1, IN.size()))
             ),
             std::stoi(IN[LIST_SIZE_POS])
-        };
-        return type;
+		});
     }
 
     Type Type::parseCollection(const std::vector<std::string>& IN){
@@ -155,20 +149,15 @@ namespace wiremap::parser{
     Type Type::parse(const std::vector<std::string>& IN){
         assert(!IN.empty());
 
-        Type type;
-
         if(isCollection(IN)){
-            type = Type::parseCollection(IN);
+            return Type::parseCollection(IN);
         } else if(isList(IN)){
-            type = Type::parseList(IN);
-        } else {
-            if(TypeMap::exists(IN.front())){
-                return TypeMap::get(IN.front());
-            }
-            type = Type::parseObject(IN.front());
+            return Type::parseList(IN);
         }
-
-        return type;
+		if(TypeMap::exists(IN.front())){
+			return TypeMap::get(IN.front());
+		}
+		return Type::parseObject(IN.front());
     }
 
     Type Type::parse(const std::string& in){
@@ -197,9 +186,12 @@ namespace wiremap::parser{
     }
 
     Type::Type(){}
+
     Type::Type(const PrimitiveType& U): base_type(Type::BaseType::PRIMITIVE), underlying_type(U){}
-    Type::Type(const UnderlyingListType& U): base_type(Type::BaseType::LIST), underlying_type(U){}
-    Type::Type(const UnderlyingCollectionType& U): base_type(Type::BaseType::COLLECTION), underlying_type(U){}
+
+	Type::Type(const UnderlyingListType& U): base_type(Type::BaseType::LIST), underlying_type(U){}
+
+	Type::Type(const UnderlyingCollectionType& U): base_type(Type::BaseType::COLLECTION), underlying_type(U){}
 
     bool operator==(const Type& a, const Type& b){
         if(a.base_type != b.base_type){

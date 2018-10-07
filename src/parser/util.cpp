@@ -3,28 +3,35 @@
 
 namespace wiremap::parser{
     std::vector<std::string> splitLine(const std::string& LINE){
-        std::vector<std::string> v;
-        std::string a;
-        for(unsigned i = 0; i < LINE.size(); i++){
-            const char& c = LINE[i];
-            if(c == ' ' || c == ','){ //TODO split at ( and ) ?
-                if(!a.empty()){
-                    v.push_back(a);
-                    a = "";
-                }
-                if(c == ','){
-                    v.push_back(",");
-                }
-            } else if(c == detail::COMMENT_START){
+		if(LINE.empty()){
+			return {};
+		}
+
+		constexpr char DELIMITER = ' ';
+		constexpr char SEPARATOR = ',';
+
+        std::vector<std::string> split;
+
+		std::string::const_iterator start = LINE.begin();
+		while(*start == DELIMITER && start != LINE.end()){
+			start++;
+		}
+
+		for(std::string::const_iterator i = start; i != LINE.end(); ++i){
+            if(*i == DELIMITER || *i == SEPARATOR){ //TODO split at ( and ) ?
+				split.emplace_back(start, i);
+				while(*i == DELIMITER && i != (LINE.end() - 1)){
+					++i;
+				}
+				start = i;
+            } else if(*i == detail::COMMENT_START){
                 break;
-            } else {
-                a += c;
             }
         }
-        if(a != ""){
-            v.push_back(a);
-        }
-        return v;
+		if(*start != DELIMITER){ // capture last part of line if it's not a delimiter
+			split.emplace_back(start, LINE.end());
+		}
+        return split;
     }
 
     unsigned indentCount(const std::string& LINE){

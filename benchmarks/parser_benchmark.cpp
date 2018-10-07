@@ -4,6 +4,13 @@
 
 using namespace wiremap::parser;
 
+static void BM_SplitLine(benchmark::State& state) {
+	const std::string LINE_EXAMPLE = "  Parameter   List of 10 Collection of Real, Bool Real Input  ";
+    for(auto _ : state){
+		splitLine(LINE_EXAMPLE);
+	}
+}
+
 static void BM_ParseDeviceFile(benchmark::State& state) {
     for(auto _ : state){
 		Project::parseFile("samples/device_sample.hpp");
@@ -18,6 +25,7 @@ static void BM_ParseDeviceFile(benchmark::State& state) {
 // 	}
 // }
 
+BENCHMARK(BM_SplitLine);
 BENCHMARK(BM_ParseDeviceFile);
 // BENCHMARK(BM_ParseProject);
 

@@ -13,15 +13,15 @@ namespace wiremap::parser{
 	}
 
 	bool ResultNode::identify(const std::vector<std::string>& LINE){
-		return LINE.size() >= 3 && LINE.front() == KEYWORD;
+		return LINE.size() >= MIN_DECLARATION_TERMS && LINE.front() == KEYWORD;
 	}
 
-    ResultNode ResultNode::parse(const std::vector<std::string>& split_line){
-        assert(split_line.size() >= 3);
+    ResultNode ResultNode::parse(const std::vector<std::string>& LINE){
+        assert(LINE.size() >= MIN_DECLARATION_TERMS);
 
         ResultNode result_node;
-        result_node.name = split_line[split_line.size() - 1];
-        result_node.type = Type::parse(subvector(split_line, 1, split_line.size() - 1));
+        result_node.name = LINE[LINE.size() - 1];
+        result_node.type = Type::parse(subvector(LINE, 1, LINE.size() - 1));
         //TODO generating function
         return result_node;
     }
@@ -40,7 +40,8 @@ namespace wiremap::parser{
     }
 
     ResultNode::ResultNode(){}
-    ResultNode::ResultNode(const std::string& NAME, const Type& TYPE): name(NAME), type(TYPE){}
+
+	ResultNode::ResultNode(const std::string& NAME, const Type& TYPE): name(NAME), type(TYPE){}
 
     bool operator==(const ResultNode& a, const ResultNode& b){
         return a.getName() == b.getName() && a.getType() == b.getType();

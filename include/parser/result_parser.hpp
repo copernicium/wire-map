@@ -13,6 +13,8 @@ namespace wiremap::parser{
 
         static constexpr std::string_view KEYWORD = "Result";
 
+		static constexpr unsigned MIN_DECLARATION_TERMS = 3;
+
 	public:
 		std::string getName()const;
 

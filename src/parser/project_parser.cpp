@@ -12,36 +12,40 @@ namespace wiremap::parser{
             return {};
         }
         std::string line;
-        std::vector<std::string> v;
-        while(std::getline(file_stream, line)){
+        std::vector<std::string> lines;
+
+		while(std::getline(file_stream, line)){
             if(!line.empty()){
-                v.push_back(line);
+                lines.push_back(line);
             }
         }
-        return v;
+        return lines;
     }
 
     void Project::parseFile(const std::filesystem::path& FILE){
         if(FILE.extension() != FILE_EXTENSION){
             return;
         }
+
         const std::vector<std::string> LINES = readFile(FILE);
-        if(FILE.stem() == PROJECT_MAIN_FILE_NAME){
+
+		if(FILE.stem() == PROJECT_MAIN_FILE_NAME){
             WireMapParser::parse(LINES);
-        }
-        for(unsigned i = 0; i < LINES.size(); i++){
-            if(indentCount(LINES[i]) == 0){
-                std::vector<std::string> split_line = splitLine(LINES[i]);
+        } else {
+			for(unsigned i = 0; i < LINES.size(); i++){
+				if(indentCount(LINES[i]) == 0){
+					std::vector<std::string> line = splitLine(LINES[i]);
 
-                std::vector<std::string> scope = captureScope(LINES, i);
-                i += scope.size() - 1; //skip scope in next search
+					if(DeviceNode::identify(line)){
+						std::vector<std::string> scope = captureScope(LINES, i);
+						i += scope.size() - 1; //skip scope in next search
 
-                if(DeviceNode::identify(split_line)){
-                    DeviceNodes::parse(scope);
-                } else if(TypeMap::identify(split_line)){
-                    TypeMap::parse(split_line);
-                }
-            }
+						DeviceNodes::parse(scope);
+					} else if(TypeMap::identify(line)){
+						TypeMap::parse(line);
+					}
+				}
+			}
         }
     }
 
@@ -56,7 +60,7 @@ namespace wiremap::parser{
                 }
             }
         }
-        if(main_file.has_value()){
+        if(main_file.has_value()){ // Parse main file lastly to set up device instances
             parseFile(main_file.value());
         }
     }
