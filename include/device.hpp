@@ -34,12 +34,26 @@ namespace wiremap{
             return i->second;
         }
 
+		bool exists(const detail::KeyType& KEY)const{
+			if(parameters != nullptr && parameters->find(KEY) != parameters->end()){
+				return true;
+			}
+			if(constants != nullptr && constants->find(KEY) != constants->end()){
+				return true;
+			}
+			if(results != nullptr && results->find(KEY) != results->end()){
+				return true;
+			}
+			return false;
+		}
+
         Device()noexcept{}
         Device(const detail::KeyType&)noexcept{}
 
         template<typename First, typename... Members>
         Device(const std::pair<detail::KeyType, First>& first_member, const Members&... members)noexcept: Device(members...){
             static_assert(std::is_base_of_v<detail::DeviceMemberBase,First>, "Constructing device from non-member type");
+			assert(!exists(first_member.first));
             if constexpr(std::is_base_of_v<detail::ResultBase,First>){
                 if(results == nullptr){
                     results = std::make_shared<google::dense_hash_map<detail::KeyType,std::shared_ptr<detail::ResultBase>,detail::Hasher,detail::KeyCompare>>();

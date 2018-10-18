@@ -26,6 +26,11 @@ namespace wiremap{
             add(hashstr(KEY), DEVICE);
         }
 
+		template<typename... Members>
+		static void add(const std::string& KEY, const Members&... DEVICE_MEMBERS)noexcept{
+			add(hashstr(KEY), Device(DEVICE_MEMBERS...));
+		}
+
         static Device& get(const detail::KeyType& KEY)noexcept{
             assert(devices != nullptr && devices->find(KEY) != devices->end());
             return (*devices)[KEY];
