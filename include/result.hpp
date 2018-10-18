@@ -14,9 +14,9 @@ namespace wiremap{
 
     private:
         detail::KeyType source_device_key;
-        std::shared_ptr<google::dense_hash_map<detail::KeyType,detail::KeyType,detail::Hasher,detail::KeyCompare>> source_parameter_hashes;
+        google::dense_hash_map<detail::KeyType,detail::KeyType,detail::Hasher,detail::KeyCompare> source_parameter_hashes;
         unsigned update_count;
-        std::shared_ptr<T> cache;
+		std::optional<T> cache;
         std::function<T(void)> update_function; //TODO use wire map function instead
 
         void setSourceDeviceKey(const detail::KeyType& D_KEY){
@@ -28,11 +28,11 @@ namespace wiremap{
             return update_count;
         }
 
-        const std::shared_ptr<T>& get(){
-            if(cache == nullptr){
-                cache = std::make_shared<T>(update_function());
+        const T& get(){
+            if(!cache.has_value()){
+                cache = update_function();
             }
-            for(const std::pair<detail::KeyType, detail::KeyType>& source_parameter: *source_parameter_hashes){
+            for(const std::pair<detail::KeyType, detail::KeyType>& source_parameter: source_parameter_hashes){
                 /*
                 TODO check if results parameters point to have been updated
                 if(update case){
@@ -43,11 +43,11 @@ namespace wiremap{
                 }
                 */
             }
-            return cache;
+            return cache.value();
         }
 
-        Result(const std::function<T(void)>& F): source_device_key(0), source_parameter_hashes(std::make_shared<google::dense_hash_map<detail::KeyType,detail::KeyType,detail::Hasher,detail::KeyCompare>>()), update_count(0), cache(nullptr), update_function(F){
-            source_parameter_hashes->set_empty_key(0);
+        Result(const std::function<T(void)>& F): source_device_key(0), source_parameter_hashes(), update_count(0), cache(), update_function(F){
+            source_parameter_hashes.set_empty_key(0);
         }
 
         Result() = delete;
@@ -80,12 +80,6 @@ namespace wiremap{
         if(A.update_function != B.update_function){
             return false;
         }
-        if((A.cache == nullptr) != (B.cache == nullptr)){
-            return false;
-        }
-        if(A.cache != nullptr){
-            return (*A.cache) == (*B.cache);
-        }
-        return true;
+        return A.cache == B.cache;
     }
 }

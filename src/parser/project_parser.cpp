@@ -6,7 +6,7 @@
 #include <fstream>
 
 namespace wiremap::parser{
-    std::vector<std::string> readFile(const std::filesystem::path& FILE){
+    std::vector<std::string> readFile(const std::filesystem::path& FILE){ //consider splitting every line here
         std::ifstream file_stream(FILE, std::ifstream::in);
         if(!file_stream.is_open() || file_stream.peek() == std::ifstream::traits_type::eof()){
             return {};

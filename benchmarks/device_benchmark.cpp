@@ -1,7 +1,9 @@
 #include <benchmark/benchmark.h>
 
+#include "parameter.hpp"
+#include "result.hpp"
 #include "types.hpp"
-#include "accessors.hpp"
+#include "wiremap.hpp"
 
 using namespace wiremap;
 
@@ -76,7 +78,7 @@ static void BM_ParameterAccess(benchmark::State& state) {
 
     for(auto _ : state){
         Parameter<Integer> p = {"spark1", "current"};
-        Result<Integer> r2 = getResult(p);
+        Result<Integer> r2 = p.get();
 
         // printf("value:%ld \n",r2.get()->require());
     }

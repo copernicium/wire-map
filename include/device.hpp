@@ -13,19 +13,25 @@ namespace wiremap{
         std::shared_ptr<google::dense_hash_map<detail::KeyType,std::shared_ptr<detail::ResultBase>,detail::Hasher,detail::KeyCompare>> results;
 
     public:
-        const std::shared_ptr<const detail::ParameterBase> getParameter(const detail::KeyType& P_KEY)const noexcept{
-            assert(parameters != nullptr && (*parameters)[P_KEY] != nullptr);
-            return (*parameters)[P_KEY];
+        const std::shared_ptr<const detail::ParameterBase> getParameter(const detail::KeyType& KEY)const noexcept{
+            assert(parameters != nullptr);
+			auto i = parameters->find(KEY);
+			assert(i != parameters->end());
+            return i->second;
         }
 
-        const std::shared_ptr<const detail::ConstantBase> getConstant(const detail::KeyType& C_KEY)const noexcept{
-            assert(constants != nullptr && (*constants)[C_KEY] != nullptr);
-            return (*constants)[C_KEY];
+        const std::shared_ptr<const detail::ConstantBase> getConstant(const detail::KeyType& KEY)const noexcept{
+            assert(constants != nullptr);
+			auto i = constants->find(KEY);
+			assert(i != constants->end());
+            return i->second;
         }
 
-        const std::shared_ptr<const detail::ResultBase> getResult(const detail::KeyType& R_KEY)const noexcept{
-            assert(results != nullptr && (*results)[R_KEY] != nullptr);
-            return (*results)[R_KEY];
+        const std::shared_ptr<const detail::ResultBase> getResult(const detail::KeyType& KEY)const noexcept{
+            assert(results != nullptr);
+			auto i = results->find(KEY);
+			assert(i != results->end());
+            return i->second;
         }
 
         Device()noexcept{}

@@ -4,6 +4,7 @@
 #include "device_bases.hpp"
 #include "object.hpp"
 #include "wiremap.hpp"
+#include "result.hpp"
 
 namespace wiremap{
     template<typename T>
@@ -26,8 +27,8 @@ namespace wiremap{
 
         Parameter() = delete;
 
-        const std::shared_ptr<const detail::ResultBase> get()const noexcept{
-            return WireMap::get(source_device_key).getResult(source_result_key);
+        const Result<T>& get()const noexcept{
+			return *std::dynamic_pointer_cast<const Result<T>>(WireMap::get(source_device_key).getResult(source_result_key));
         }
 
         template<typename>
