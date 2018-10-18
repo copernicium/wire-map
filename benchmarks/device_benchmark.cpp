@@ -33,20 +33,26 @@ static void BM_DeviceConstructor0(benchmark::State& state) {
 
 static void BM_DeviceConstructor1(benchmark::State& state) {
     Parameter<Integer> p = {"roborio", "pulse_width_1"};
+	auto member = std::make_pair("pulse_width_1",p);
+
     for(auto _ : state){
         Device spark1 = {
-            std::make_pair("pulse_width_1",p)
+            member
         };
     }
 }
 
 static void BM_DeviceConstructor2(benchmark::State& state) {
     Parameter<Integer> p = {"roborio", "pulse_width_1"};
-    Result<Integer> r = std::function<Integer(void)>([]{ return 5; });
+	auto member1 = std::make_pair("pulse_width_1",p);
+
+	Result<Integer> r = std::function<Integer(void)>([]{ return 5; });
+	auto member2 = std::make_pair("current",r);
+
     for(auto _ : state){
         Device spark1 = {
-            std::make_pair("pulse_width_1",p),
-            std::make_pair("current",r)
+			member1,
+			member2
         };
     }
     WireMap::reset();
@@ -62,7 +68,6 @@ static void BM_DeviceSetup(benchmark::State& state) {
             std::make_pair("current",r)
         );
 
-        Parameter<Integer> p = {"spark1", "current"};
         i++;
     }
     WireMap::reset();
@@ -80,7 +85,7 @@ static void BM_ParameterAccess(benchmark::State& state) {
         Parameter<Integer> p = {"spark1", "current"};
         Result<Integer> r2 = p.get();
 
-        // printf("value:%ld \n",r2.get()->require());
+        // printf("value:%ld \n",r2.get().require());
     }
     WireMap::reset();
 }
