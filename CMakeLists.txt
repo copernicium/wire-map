@@ -75,7 +75,7 @@ ADD_DEPENDENCIES(wiremap sparsehash)
 # Install Google Test
 
 IF(TESTING MATCHES "[Tt][Rr][Uu][Ee]" OR TESTING MATCHES "[Oo][Nn]" OR BENCHMARKS MATCHES "[Tt][Rr][Uu][Ee]" OR BENCHMARKS MATCHES "[Oo][Nn]")
-  IF(NOT EXISTS ${EXTERNAL_INSTALL_DIR}/gtest)
+  IF(NOT EXISTS ${EXTERNAL_INSTALL_DIR}/lib AND NOT EXISTS ${EXTERNAL_INSTALL_DIR}/lib64)
     EXTERNALPROJECT_ADD(GoogleTest
       PREFIX ${EXTERNAL_INSTALL_DIR}/gtest
       DOWNLOAD_DIR ${EXTERNAL_INSTALL_DIR}
@@ -121,7 +121,7 @@ ENDIF()
 IF(BENCHMARKS MATCHES "[Tt][Rr][Uu][Ee]" OR BENCHMARKS MATCHES "[Oo][Nn]")
   # Install Benchmark
 
-  IF(NOT EXISTS ${EXTERNAL_INSTALL_DIR}/benchmark)
+  IF(NOT EXISTS ${EXTERNAL_INSTALL_DIR}/lib AND NOT EXISTS ${EXTERNAL_INSTALL_DIR}/lib64)
     EXTERNALPROJECT_ADD(Benchmark
       PREFIX ${EXTERNAL_INSTALL_DIR}/benchmark
       GIT_REPOSITORY https://github.com/google/benchmark
@@ -141,7 +141,7 @@ IF(BENCHMARKS MATCHES "[Tt][Rr][Uu][Ee]" OR BENCHMARKS MATCHES "[Oo][Nn]")
     MESSAGE("\tBenchmark \"${benchmark_name}\" found. Generating build target")
 
     ADD_EXECUTABLE(${benchmark_name} ${file})
-    ADD_DEPENDENCIES(${test_name} GoogleTest Benchmark parser wiremap)
+    ADD_DEPENDENCIES(${benchmark_name} Benchmark parser wiremap)
 
     TARGET_LINK_LIBRARIES(${benchmark_name} wiremap parser pthread benchmark benchmark_main gtest gtest_main)
     TARGET_COMPILE_OPTIONS(${benchmark_name} PUBLIC -pthread)
