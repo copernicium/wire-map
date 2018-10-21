@@ -7,8 +7,19 @@
 
 using namespace wiremap;
 
+
+void setup_sample_wiremap(){
+	WireMap::reset();
+	Result<Integer> r= std::function<Integer(void)>([]{ return 5; });
+    WireMap::add(
+        "roborio",
+        std::make_pair("pulse_width_1",r)
+	);
+}
+
 static void BM_ParameterConstructor(benchmark::State& state) {
-    for(auto _ : state){
+	setup_sample_wiremap();
+	for(auto _ : state){
         Parameter<Integer> p = {"roborio", "pulse_width_1"};
     }
 }
@@ -37,12 +48,14 @@ static void BM_DeviceConstructor1(benchmark::State& state) {
 
     for(auto _ : state){
         Device spark1 = {
-            member
+			"spark1",
+			member
         };
     }
 }
 
 static void BM_DeviceConstructor2(benchmark::State& state) {
+	setup_sample_wiremap();
     Parameter<Integer> p = {"roborio", "pulse_width_1"};
 	auto member1 = std::make_pair("pulse_width_1",p);
 
@@ -51,11 +64,11 @@ static void BM_DeviceConstructor2(benchmark::State& state) {
 
     for(auto _ : state){
         Device spark1 = {
+			"spark1",
 			member1,
 			member2
         };
     }
-    WireMap::reset();
 }
 
 static void BM_DeviceSetup(benchmark::State& state) {
@@ -74,20 +87,14 @@ static void BM_DeviceSetup(benchmark::State& state) {
 }
 
 static void BM_ParameterAccess(benchmark::State& state) {
-    Result<Integer> r = std::function<Integer(void)>([]{ return 5; });
-
-    WireMap::add(
-        "spark1",
-        std::make_pair("current",r)
-    );
+	setup_sample_wiremap();
 
     for(auto _ : state){
-        Parameter<Integer> p = {"spark1", "current"};
-        Result<Integer> r2 = p.get();
+        Parameter<Integer> p = {"roborio", "pulse_width_1"};
+        Integer r2 = p.get();
 
-        // printf("value:%ld \n",r2.get().require());
+        // printf("value:%ld \n",r2.require());
     }
-    WireMap::reset();
 }
 
 BENCHMARK(BM_ParameterConstructor);

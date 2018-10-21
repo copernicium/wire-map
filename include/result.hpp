@@ -7,6 +7,7 @@
 #include "object.hpp"
 #include "wiremap.hpp"
 
+// A Result is a function that generates its output using a set of Parameters within the same device as it
 namespace wiremap{
     template<typename T>
     struct Result: public detail::ResultBase{
@@ -14,8 +15,7 @@ namespace wiremap{
 
     private:
         detail::KeyType source_device_key;
-        google::dense_hash_map<detail::KeyType,detail::KeyType,detail::Hasher,detail::KeyCompare> source_parameter_hashes;
-        unsigned update_count;
+        google::dense_hash_map<detail::KeyType,detail::KeyType,detail::Hasher,detail::KeyCompare> source_parameter_hashes; //TODO Peripherals need Results too
 		std::optional<T> cache;
         std::function<T(void)> update_function; //TODO use wire map function instead
 
@@ -24,29 +24,14 @@ namespace wiremap{
         }
 
     public:
-        unsigned getUpdateCount()const{
-            return update_count;
-        }
-
         const T& get(){
             if(!cache.has_value()){
                 cache = update_function();
             }
-            for(const std::pair<detail::KeyType, detail::KeyType>& source_parameter: source_parameter_hashes){
-                /*
-                TODO check if results parameters point to have been updated
-                if(update case){
-                    update_count++;
-                    auto param = WireMap::get(source_device_hash).getParameter(source_parameter);
-                    param.updateCount()
-                    cache = update_function(param);
-                }
-                */
-            }
             return cache.value();
         }
 
-        Result(const std::function<T(void)>& F): source_device_key(0), source_parameter_hashes(), update_count(0), cache(), update_function(F){
+        Result(const std::function<T(void)>& F): source_device_key(0), source_parameter_hashes(), cache(), update_function(F){
             source_parameter_hashes.set_empty_key(0);
         }
 

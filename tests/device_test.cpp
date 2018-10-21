@@ -16,9 +16,9 @@ TEST(DeviceTest, ParameterTest){
     );
 
     Parameter<Integer> p = {"spark1", "current"};
-    Result<Integer> r2 = p.get();
+    Integer r2 = p.get();
 
-    EXPECT_EQ(r2.get().require(), 5);
+    EXPECT_EQ(r2.require(), r.get().require());
 }
 
 TEST(DeviceTest, Constructor){

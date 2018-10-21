@@ -6,29 +6,28 @@
 #include "wiremap.hpp"
 #include "result.hpp"
 
+// A Parameter is a constant pointer to the value of a Result in the WireMap
 namespace wiremap{
     template<typename T>
     struct Parameter: public detail::ParameterBase{
         static_assert(detail::is_wiremap_object_v<T>,"Constant built from type not derived from detail::ObjectBase");
 
     private:
-        detail::KeyType source_device_key;
-        detail::KeyType source_result_key;
-        unsigned update_count;
-
-        void updateCount(){
-            update_count = WireMap::get(source_device_key).getResult(source_result_key)->getUpdateCount();
-        }
+		std::shared_ptr<Result<T>> source;
 
     public:
-        Parameter(const detail::KeyType& d_src, const detail::KeyType& r_src)noexcept: source_device_key(d_src), source_result_key(r_src), update_count(0){}
+        Parameter(const detail::KeyType& source_device_key, const detail::KeyType& source_result_key)noexcept: source(
+			std::dynamic_pointer_cast<Result<T>>(
+				WireMap::get(source_device_key).getResult(source_result_key)
+			)
+		){}
 
         Parameter(const std::string& d_src, const std::string& r_src)noexcept: Parameter(hashstr(d_src),hashstr(r_src)){}
 
         Parameter() = delete;
 
-        const Result<T>& get()const noexcept{
-			return *std::dynamic_pointer_cast<const Result<T>>(WireMap::get(source_device_key).getResult(source_result_key));
+        const T& get()const noexcept{
+			return source->get();
         }
 
         template<typename>

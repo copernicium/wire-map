@@ -14,21 +14,18 @@ namespace wiremap{
             devices->set_empty_key(0);
         }
 
-        static void add(const detail::KeyType& KEY, const Device& DEVICE)noexcept{
+        template<typename... Members>
+        static void add(const detail::KeyType& KEY, const Members&... DEVICE_MEMBERS)noexcept{
             if(devices == nullptr){
                 reset();
             }
             assert(!exists(KEY));
-            (*devices)[KEY] = Device(KEY, DEVICE);
-        }
-
-        static void add(const std::string& KEY, const Device& DEVICE)noexcept{
-            add(hashstr(KEY), DEVICE);
+            (*devices)[KEY] = Device(KEY, DEVICE_MEMBERS...);
         }
 
 		template<typename... Members>
 		static void add(const std::string& KEY, const Members&... DEVICE_MEMBERS)noexcept{
-			add(hashstr(KEY), Device(DEVICE_MEMBERS...));
+			add(hashstr(KEY), DEVICE_MEMBERS...);
 		}
 
         static Device& get(const detail::KeyType& KEY)noexcept{

@@ -2,6 +2,8 @@
 #include "parser/device_parser.hpp"
 #include "parser/util.hpp"
 #include "util.hpp"
+#include "types.hpp"
+#include "constant.hpp"
 #include "wiremap.hpp"
 
 namespace wiremap::parser{
@@ -19,7 +21,7 @@ namespace wiremap::parser{
                 printf("Found:%s\n", DeviceNodes::get(split_line[DEVICE_TYPE_POS]).toString().c_str());
 
                 //TODO construct device and add it
-                WireMap::add(split_line[DEVICE_NAME_POS], {});
+                WireMap::add(split_line[DEVICE_NAME_POS], std::make_pair(std::string("NYI"), Constant<Integer>(0)));
             }
         }
         NYI

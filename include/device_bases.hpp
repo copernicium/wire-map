@@ -18,7 +18,6 @@ namespace wiremap::detail{
 
     struct ResultBase: public DeviceMemberBase{
         virtual void setSourceDeviceKey(const detail::KeyType&) = 0;
-        virtual unsigned getUpdateCount()const = 0;
 
         virtual ~ResultBase() = default;
     };

@@ -4,6 +4,7 @@
 #include "device_bases.hpp"
 #include "list.hpp"
 
+// A Constant is a constant value
 namespace wiremap{
     template<typename T>
     struct Constant: public detail::ObjectBase, public detail::ConstantBase{
