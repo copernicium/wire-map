@@ -22,6 +22,33 @@ namespace wiremap::parser{
 		return results;
 	}
 
+	int DeviceNode::getParameter(const std::string& NAME)const{
+		for(unsigned i = 0; i < parameters.size(); i++){
+			if(parameters[i].getName() == NAME){
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	bool DeviceNode::isConstant(const std::string& NAME)const{
+		for(const ConstantNode& A: constants){
+			if(A.getName() == NAME){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	bool DeviceNode::isResult(const std::string& NAME)const{
+		for(const ResultNode& A: results){
+			if(A.getName() == NAME){
+				return true;
+			}
+		}
+		return false;
+	}
+
     bool DeviceNode::identify(const std::vector<std::string>& LINE){
         return LINE.size() == REQUIRED_LINE_SIZE && LINE[KEYWORD_POS] == KEYWORD;
     }

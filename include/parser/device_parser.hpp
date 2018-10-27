@@ -26,6 +26,10 @@ namespace wiremap::parser{
 		std::vector<ConstantNode> getConstants()const;
 		std::vector<ResultNode> getResults()const;
 
+		int getParameter(const std::string&)const;
+		bool isConstant(const std::string&)const;
+		bool isResult(const std::string&)const;
+
         static bool identify(const std::vector<std::string>&);
         static DeviceNode parse(const std::vector<std::string>&);
 
@@ -33,6 +37,8 @@ namespace wiremap::parser{
 
         DeviceNode();
         DeviceNode(const std::string&, const std::vector<ParameterNode>&, const std::vector<ConstantNode>&, const std::vector<ResultNode>&);
+
+		friend WireMapParser;
     };
 
     bool operator==(const DeviceNode&, const DeviceNode&);

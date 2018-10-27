@@ -8,7 +8,8 @@ namespace wiremap::parser{
 		}
 
 		constexpr char DELIMITER = ' ';
-		constexpr char SEPARATOR = ',';
+		constexpr unsigned SEPARATOR_COUNT = 2;
+		constexpr std::array<char, SEPARATOR_COUNT> SEPARATORS = {',', '.'};
 
         std::vector<std::string> split;
 
@@ -18,8 +19,13 @@ namespace wiremap::parser{
 		}
 
 		for(std::string::const_iterator i = start; i != LINE.end(); ++i){
-            if(*i == DELIMITER || *i == SEPARATOR){ //TODO split at ( and ) ?
+			const char* separator = std::find(SEPARATORS.begin(), SEPARATORS.end(), *i);
+            if(*i == DELIMITER || separator != SEPARATORS.end()){ //TODO split at ( and ) ?
 				split.emplace_back(start, i);
+				if(separator != SEPARATORS.end()){
+					split.emplace_back(separator, 1); // add only one separator: the one that was found
+					++i;
+				}
 				while(*i == DELIMITER && i != (LINE.end() - 1)){
 					++i;
 				}

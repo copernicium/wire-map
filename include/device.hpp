@@ -6,6 +6,8 @@
 namespace wiremap{
     struct Device{
     private:
+		detail::KeyType device_key;
+
         google::dense_hash_map<detail::KeyType,std::shared_ptr<detail::ParameterBase>,detail::Hasher,detail::KeyCompare> parameters;
 
         google::dense_hash_map<detail::KeyType,std::shared_ptr<const detail::ConstantBase>,detail::Hasher,detail::KeyCompare> constants;
@@ -52,13 +54,29 @@ namespace wiremap{
 				results.find(KEY) != results.end();
 		}
 
+        template<typename Member, typename = std::enable_if_t<std::is_base_of_v<detail::DeviceMemberBase, Member>>>
+        void add(const std::pair<detail::KeyType, Member>& MEMBER)noexcept{
+			assert(!exists(MEMBER.first));
+
+			if constexpr(std::is_base_of_v<detail::ResultBase,Member>){
+                results[MEMBER.first] = std::make_shared<Member>(MEMBER.second);
+				results[MEMBER.first]->setSourceDeviceKey(device_key);
+            } else if constexpr(std::is_base_of_v<detail::ParameterBase,Member>){
+                parameters[MEMBER.first] = std::make_shared<Member>(MEMBER.second);
+            } else if constexpr(std::is_base_of_v<detail::ConstantBase,Member>){
+                constants[MEMBER.first] = std::make_shared<Member>(MEMBER.second);
+            }
+        }
+
         Device()noexcept{
 			results.set_empty_key(0);
 			parameters.set_empty_key(0);
 			constants.set_empty_key(0);
 		}
 
-		Device(const detail::KeyType&)noexcept: Device(){}
+		Device(const detail::KeyType& DEVICE_KEY)noexcept: Device(){
+			device_key = DEVICE_KEY;
+		}
 
         template<typename First, typename... Members>
         Device(const detail::KeyType& DEVICE_KEY, const std::pair<detail::KeyType, First>& first_member, const Members&... members)noexcept: Device(DEVICE_KEY, members...){

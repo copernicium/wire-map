@@ -43,6 +43,9 @@ TEST(DeviceTest, ComplexParameterTest){
     EXPECT_EQ(r2.require(), r.get().require());
 }
 
+TEST(DeviceTest, TypeInterpretation){
+}
+
 TEST(DeviceTest, Constructor){
     Device a;
     //Fine as long as it compiles

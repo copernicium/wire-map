@@ -1,6 +1,7 @@
 #pragma once
 
 #include "parser/type_parser.hpp"
+#include "parser/wiremap_parser.hpp"
 
 namespace wiremap::parser{
     struct ParameterNode{
@@ -9,7 +10,7 @@ namespace wiremap::parser{
 
         Type type;
 
-        std::optional<std::string> source_device;
+        std::optional<std::string> source_device; // TODO: since nodes are used to define types, not specific instances, this shouldn't be here
 
         std::optional<std::string> source_result;
 
@@ -37,6 +38,8 @@ namespace wiremap::parser{
         ParameterNode();
 
         ParameterNode(const std::string&, const Type&, const std::optional<std::string>&, const std::optional<std::string>&);
+
+		friend WireMapParser;
     };
 
     bool operator==(const ParameterNode&, const ParameterNode&);
