@@ -4,15 +4,12 @@
 #include <memory>
 #include "device_bases.hpp"
 #include "function.hpp"
-#include "object.hpp"
 #include "wiremap.hpp"
 
 // A Result is a function that generates its output using a set of Parameters within the same device as it
 namespace wiremap{
     template<typename T>
     struct Result: public detail::ResultBase{
-        static_assert(detail::is_wiremap_object_v<T>,"Constant built from type not derived from detail::ObjectBase");
-
     private:
         detail::KeyType source_device_key;
         google::dense_hash_map<detail::KeyType,detail::KeyType,detail::Hasher,detail::KeyCompare> source_parameter_hashes; //TODO Peripherals need Results too

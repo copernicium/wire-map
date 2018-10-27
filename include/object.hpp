@@ -3,6 +3,7 @@
 #include <cassert>
 #include <iostream>
 #include "util.hpp"
+#include "parameter.hpp"
 
 namespace wiremap{
     namespace attributes{
@@ -58,9 +59,20 @@ namespace wiremap{
                 attributes::Attribute<T,Attributes...>::verify(default_value);
             }
 
-            Object(const T& v)noexcept: Object(v, DefaultValue){
-                attributes::Attribute<T,Attributes...>::verify(value);
-            }
+            Object(const T& v)noexcept: Object(v, DefaultValue){}
+
+			Object(const std::shared_ptr<ParameterBase>& parameter){
+				if(parameter == nullptr){
+					assert(0);
+				}
+				std::shared_ptr<Parameter<Object<T, DefaultValue, Attributes...>>> inner = std::dynamic_pointer_cast<Parameter<Object<T, DefaultValue, Attributes...>>>(parameter);
+				if(inner == nullptr){
+					assert(0);
+				}
+				value = inner->get().value;
+				default_value = inner->get().default_value;
+				valid = inner->get().valid;
+			}
 
             Object()noexcept: default_value(DefaultValue),valid(false){}
 

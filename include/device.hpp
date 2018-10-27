@@ -6,18 +6,23 @@
 namespace wiremap{
     struct Device{
     private:
-        google::dense_hash_map<detail::KeyType,std::shared_ptr<const detail::ParameterBase>,detail::Hasher,detail::KeyCompare> parameters;
+        google::dense_hash_map<detail::KeyType,std::shared_ptr<detail::ParameterBase>,detail::Hasher,detail::KeyCompare> parameters;
 
         google::dense_hash_map<detail::KeyType,std::shared_ptr<const detail::ConstantBase>,detail::Hasher,detail::KeyCompare> constants;
 
         google::dense_hash_map<detail::KeyType,std::shared_ptr<detail::ResultBase>,detail::Hasher,detail::KeyCompare> results;
 
     public:
-        const std::shared_ptr<const detail::ParameterBase>& getParameter(const detail::KeyType& KEY)const noexcept{
+        const std::shared_ptr<detail::ParameterBase>& getParameter(const detail::KeyType& KEY)const noexcept{
 			const auto& i = parameters.find(KEY);
 			assert(i != parameters.end());
             return i->second;
         }
+
+		template<typename RawKeyType, typename = std::enable_if_t<std::is_convertible_v<RawKeyType, std::string>>>
+		const std::shared_ptr<detail::ParameterBase>& getParameter(const RawKeyType& KEY)const noexcept{
+			return getParameter(hashstr(KEY));
+		}
 
         const std::shared_ptr<const detail::ConstantBase>& getConstant(const detail::KeyType& KEY)const noexcept{
 			const auto& i = constants.find(KEY);
@@ -25,11 +30,21 @@ namespace wiremap{
             return i->second;
         }
 
+		template<typename RawKeyType, typename = std::enable_if_t<std::is_convertible_v<RawKeyType, std::string>>>
+        const std::shared_ptr<const detail::ConstantBase>& getConstant(const RawKeyType& KEY)const noexcept{
+			return getConstant(hashstr(KEY));
+		}
+
         const std::shared_ptr<detail::ResultBase>& getResult(const detail::KeyType& KEY)const noexcept{
 			const auto& i = results.find(KEY);
 			assert(i != results.end());
             return i->second;
         }
+
+		template<typename RawKeyType, typename = std::enable_if_t<std::is_convertible_v<RawKeyType, std::string>>>
+        const std::shared_ptr<detail::ResultBase>& getResult(const RawKeyType& KEY)const noexcept{
+			return getResult(hashstr(KEY));
+		}
 
 		bool exists(const detail::KeyType& KEY)const{
 			return parameters.find(KEY) != parameters.end() ||
@@ -61,7 +76,7 @@ namespace wiremap{
             }
         }
 
-		template<typename RawKeyType, typename First, typename... Members>
+		template<typename RawKeyType, typename = std::enable_if_t<std::is_convertible_v<RawKeyType, std::string>>, typename First, typename... Members>
         Device(const detail::KeyType& DEVICE_KEY, const std::pair<RawKeyType, First>& first_member, const Members&... members)noexcept: Device(DEVICE_KEY, std::make_pair(hashstr(first_member.first), first_member.second), members...){}
 
         template<typename... Members>
