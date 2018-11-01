@@ -7,7 +7,7 @@ namespace wiremap::parser{
 	private:
 		std::string name;
 
-        Type type;
+        TypeNode type;
 
         std::optional<std::string> value;
 
@@ -16,7 +16,7 @@ namespace wiremap::parser{
 	public:
 		std::string getName()const;
 
-		Type getType()const;
+		TypeNode getType()const;
 
 		std::optional<std::string> getValue()const;
 
@@ -28,7 +28,7 @@ namespace wiremap::parser{
 
         ConstantNode();
 
-        ConstantNode(const std::string&, const Type&, const std::optional<std::string>&);
+        ConstantNode(const std::string&, const TypeNode&, const std::optional<std::string>&);
 
         std::string toString()const;
     };

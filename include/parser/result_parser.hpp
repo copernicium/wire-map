@@ -7,7 +7,7 @@ namespace wiremap::parser{
 	private:
 		std::string name;
 
-        Type type;
+        TypeNode type;
 
         //TODO generating function
 
@@ -18,7 +18,7 @@ namespace wiremap::parser{
 	public:
 		std::string getName()const;
 
-		Type getType()const;
+		TypeNode getType()const;
 
 		static bool identify(const std::vector<std::string>&);
 
@@ -28,7 +28,7 @@ namespace wiremap::parser{
 
         ResultNode();
 
-		ResultNode(const std::string&, const Type&);
+		ResultNode(const std::string&, const TypeNode&);
 
         std::string toString()const;
     };

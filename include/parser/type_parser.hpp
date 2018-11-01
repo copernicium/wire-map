@@ -13,7 +13,7 @@
 #include "parser/util.hpp"
 
 namespace wiremap::parser{
-    struct Type{
+    struct TypeNode{
         enum class BaseType{
             PRIMITIVE,
             LIST,
@@ -32,9 +32,9 @@ namespace wiremap::parser{
             REAL
         };
 
-        using UnderlyingListType = std::pair<std::shared_ptr<Type>, std::size_t>;
+        using UnderlyingListType = std::pair<std::shared_ptr<TypeNode>, std::size_t>;
 
-        using UnderlyingCollectionType = std::vector<std::shared_ptr<Type>>;
+        using UnderlyingCollectionType = std::vector<std::shared_ptr<TypeNode>>;
 
         using UnderlyingType = std::variant<PrimitiveType, UnderlyingListType, UnderlyingCollectionType>;
 
@@ -55,9 +55,9 @@ namespace wiremap::parser{
 
         UnderlyingType underlying_type;
 
-        static Type parseObject(const std::string&);
-        static Type parseList(const std::vector<std::string>&);
-        static Type parseCollection(const std::vector<std::string>&);
+        static TypeNode parseObject(const std::string&);
+        static TypeNode parseList(const std::vector<std::string>&);
+        static TypeNode parseCollection(const std::vector<std::string>&);
     public:
 
         BaseType getBaseType()const;
@@ -66,27 +66,27 @@ namespace wiremap::parser{
 
         unsigned getListSize()const;
 
-        Type getListType()const;
+        TypeNode getListType()const;
 
-        std::vector<Type> getCollectionTypes()const;
+        std::vector<TypeNode> getCollectionTypes()const;
 
-        static Type parse(const std::vector<std::string>&);
-        static Type parse(const std::string&);
+        static TypeNode parse(const std::vector<std::string>&);
+        static TypeNode parse(const std::string&);
 
-        Type();
-        Type(const PrimitiveType&);
-        Type(const UnderlyingListType&);
-        Type(const UnderlyingCollectionType&);
+        TypeNode();
+        TypeNode(const PrimitiveType&);
+        TypeNode(const UnderlyingListType&);
+        TypeNode(const UnderlyingCollectionType&);
 
         std::string toString()const;
 
-        friend bool operator==(const Type&, const Type&);
+        friend bool operator==(const TypeNode&, const TypeNode&);
     };
 
-    bool operator==(const Type&, const Type&);
-    bool operator!=(const Type&, const Type&);
+    bool operator==(const TypeNode&, const TypeNode&);
+    bool operator!=(const TypeNode&, const TypeNode&);
 
-    std::string asString(const Type::BaseType&);
+    std::string asString(const TypeNode::BaseType&);
 
     struct TypeMap{
         static constexpr std::string_view KEYWORD = "as";
@@ -94,7 +94,7 @@ namespace wiremap::parser{
         static constexpr unsigned MINIMUM_LINE_SIZE = 3;
 
     private:
-        static std::shared_ptr<google::dense_hash_map<wiremap::detail::KeyType,Type,wiremap::detail::Hasher,wiremap::detail::KeyCompare>> types;
+        static std::shared_ptr<google::dense_hash_map<wiremap::detail::KeyType,TypeNode,wiremap::detail::Hasher,wiremap::detail::KeyCompare>> types;
 
     public:
         static bool identify(const std::vector<std::string>& LINE){
@@ -102,7 +102,7 @@ namespace wiremap::parser{
         }
 
         static void reset(){
-            types = std::make_shared<google::dense_hash_map<wiremap::detail::KeyType,Type,wiremap::detail::Hasher,wiremap::detail::KeyCompare>>();
+            types = std::make_shared<google::dense_hash_map<wiremap::detail::KeyType,TypeNode,wiremap::detail::Hasher,wiremap::detail::KeyCompare>>();
             types->set_empty_key(0);
             const std::array<std::string, 9> PRIMITIVES = {
                 "Bit",
@@ -116,11 +116,11 @@ namespace wiremap::parser{
                 "Real"
             };
             for(const auto& a: PRIMITIVES){
-                add(a,Type::parse(a));
+                add(a,TypeNode::parse(a));
             }
         }
 
-        static void add(const wiremap::detail::KeyType& KEY, const Type& VALUE)noexcept{
+        static void add(const wiremap::detail::KeyType& KEY, const TypeNode& VALUE)noexcept{
             if(types == nullptr){
                 reset();
             }
@@ -128,16 +128,16 @@ namespace wiremap::parser{
             (*types)[KEY] = VALUE;
         }
 
-        static void add(const std::string& KEY, const Type& VALUE)noexcept{
+        static void add(const std::string& KEY, const TypeNode& VALUE)noexcept{
             add(hashstr(KEY),VALUE);
         }
 
-        static Type& get(const wiremap::detail::KeyType& KEY)noexcept{
+        static TypeNode& get(const wiremap::detail::KeyType& KEY)noexcept{
             assert(types != nullptr && types->find(KEY) != types->end());
             return (*types)[KEY];
         }
 
-        static Type& get(const std::string& KEY)noexcept{
+        static TypeNode& get(const std::string& KEY)noexcept{
             return get(hashstr(KEY));
         }
 
@@ -159,7 +159,7 @@ namespace wiremap::parser{
             if(exists(LINE.front())){
                 exit(EXIT_FAILURE); //TODO error, redefinition
             }
-            add(LINE.front(), Type::parse(std::vector<std::string>{LINE.begin() + KEYWORD_POS + 1, LINE.end()}));
+            add(LINE.front(), TypeNode::parse(std::vector<std::string>{LINE.begin() + KEYWORD_POS + 1, LINE.end()}));
         }
 
         TypeMap() = delete;

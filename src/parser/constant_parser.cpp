@@ -8,7 +8,7 @@ namespace wiremap::parser{
 		return name;
 	}
 
-	Type ConstantNode::getType()const{
+	TypeNode ConstantNode::getType()const{
 		return type;
 	}
 
@@ -21,7 +21,7 @@ namespace wiremap::parser{
 
         ConstantNode constant_node;
         constant_node.name = split_line[split_line.size() - 1];
-        constant_node.type = Type::parse(subvector(split_line, 1, split_line.size() - 1));
+        constant_node.type = TypeNode::parse(subvector(split_line, 1, split_line.size() - 1));
 
         return constant_node;
     }
@@ -45,7 +45,7 @@ namespace wiremap::parser{
 
     ConstantNode::ConstantNode(){}
 
-    ConstantNode::ConstantNode(const std::string& NAME, const Type& TYPE, const std::optional<std::string>& V): name(NAME), type(TYPE), value(V){}
+    ConstantNode::ConstantNode(const std::string& NAME, const TypeNode& TYPE, const std::optional<std::string>& V): name(NAME), type(TYPE), value(V){}
 
     bool operator==(const ConstantNode& a, const ConstantNode& b){
         return a.getName() == b.getName() && a.getType() == b.getType() && a.getValue() == b.getValue();

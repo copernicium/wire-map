@@ -1,9 +1,11 @@
 #include "gtest/gtest.h"
-#include "types.hpp"
+
+#include "object.hpp"
+#include "visitors.hpp"
 
 using namespace wiremap;
 
-TEST(ObjectTest, Constructor){
+TEST(PrimitiveTest, Constructor){
     Integer a;
     EXPECT_EQ(a.getDefault(), 0);
     EXPECT_EQ(a.require(), 0);
@@ -16,8 +18,8 @@ TEST(ObjectTest, Constructor){
     EXPECT_EQ((bool)b, true);
 }
 
-TEST(ObjectTest, AttributeTest){
-    using Ranged = detail::Object<int, 0, attributes::Integral<int>, attributes::InRange<int,0,0,10>>; //TODO reduce redundancy in attribute list
+TEST(PrimitiveTest, AttributeTest){
+    using Ranged = detail::Primitive<int, 0, attributes::Integral<int>, attributes::InRange<int,0,0,10>>; //TODO reduce redundancy in attribute list
     Ranged r = 6;
     EXPECT_EQ(r.get(), 6);
     Ranged r2 = 100;
@@ -26,27 +28,7 @@ TEST(ObjectTest, AttributeTest){
     EXPECT_EQ(r3.get(), 0);
 }
 
-TEST(ContainerTest, Constructor){
-    List<Integer, 4> ints;
-    EXPECT_EQ(ints.size(),4);
-
-    List<Integer,3> ints2 = std::array{1, 2, 3};
-    EXPECT_EQ(ints2[2].get(),3);
-
-    List<Integer, 3> ints3 = ints2;
-    EXPECT_EQ(ints3[1].get(),ints2[1].get());
-
-    Collection<Integer, Real> t;
-    EXPECT_EQ(t.size(),2);
-
-    Collection<Integer, Real> t2 = std::tuple<long, double>{4, 3.5};
-    EXPECT_EQ(get<1>(t2).get(),3.5);
-
-    Collection<Collection<Char, Integer>, List<Byte,5>> complex;
-    EXPECT_EQ(complex.size(),2);
-}
-
-TEST(ObjectTest, AccessTest){
+TEST(PrimitiveTest, AccessTest){
     {
         Integer a = 5;
         Real b = 3;
@@ -252,11 +234,52 @@ TEST(ObjectTest, AccessTest){
     }
 }
 
-TEST(ContainerTest, AccessTest){
-    List<Integer, 4> ints = {0,1,2,3};
-    unsigned i = 0;
-    for(const auto& a: ints){
-        EXPECT_EQ(a.get(), i);
-        i++;
-    }
+struct ExpectEq{
+	template<typename T, typename R, typename = std::enable_if_t<detail::is_wiremap_primitive_v<T>>>
+	void operator()(const Type&, const T& a, const R& b)const{
+		EXPECT_EQ(a.get(), b);
+		bool same_type = std::is_same_v<typename T::value_type, R>;
+		EXPECT_EQ(same_type, true);
+	}
+};
+
+ExpectEq expect_eq;
+
+TEST(ObjectTest, Constructor){
+	std::string type_str = "Real";
+	Type TYPE = toType(type_str);
+
+	Object a = Object::primitive(TYPE);
+	Object::visit(assign, a, 5);
+
+	Object::visit(expect_eq, a, (Real::value_type)5);
+
+	Object b = Object::primitive(TYPE);
+	Object::visit(assign, b, 5);
+
+	Object::visit(expect_eq, b, (Real::value_type)5);
+
+	Object c = Object::visit(sum, a, b);
+	Object::visit(expect_eq, c, (Real::value_type)(5 + 5));
+}
+
+TEST(ObjectTest, List){
+	Object list = Object::list(Object::primitive(Type::INTEGER), 10);
+	Object::visit(assign, list.at(1), 5);
+
+	for(unsigned i = 0; i < list.size(); i++){
+		if(i == 1){
+			Object::visit(expect_eq, list.at(i), (Integer::value_type)5);
+		} else {
+			Object::visit(expect_eq, list.at(i), (Integer::value_type)0);
+		}
+	}
+}
+
+TEST(ObjectTest, COLLECTION){
+	Object collection = Object::collection({Object::primitive(Type::REAL), Object::primitive(Type::INTEGER)});
+	Object::visit(assign, collection.at(0), (Real::value_type)5);
+
+	Object::visit(expect_eq, collection.at(0), (Real::value_type)5);
+	Object::visit(expect_eq, collection.at(1), (Integer::value_type)0);
 }

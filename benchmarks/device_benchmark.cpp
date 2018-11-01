@@ -2,7 +2,7 @@
 
 #include "parameter.hpp"
 #include "result.hpp"
-#include "types.hpp"
+#include "object.hpp"
 #include "wiremap.hpp"
 
 using namespace wiremap;

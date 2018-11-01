@@ -5,7 +5,7 @@
 namespace wiremap::parser{
     struct ObjectNode{
         std::string name;
-        Type type;
+        TypeNode type;
 
 		static ObjectNode parse(const std::string&);
     };

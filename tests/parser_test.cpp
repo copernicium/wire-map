@@ -10,13 +10,13 @@ TEST(ParserTest, DeviceTest){
     DeviceNode expected = {
         "Spark",
         {
-            {"VoltageIn",{std::make_pair(std::make_shared<Type>(Type::PrimitiveType::BOOL),10)}, {}, {}}
+            {"VoltageIn",{std::make_pair(std::make_shared<TypeNode>(TypeNode::PrimitiveType::BOOL),10)}, {}, {}}
         },
         {
-            {"Coefficient",{Type::PrimitiveType::REAL}, {}}
+            {"Coefficient",{TypeNode::PrimitiveType::REAL}, {}}
         },
         {
-            {"Current",{Type::PrimitiveType::INTEGER}}
+            {"Current",{TypeNode::PrimitiveType::INTEGER}}
         }
     };
     EXPECT_EQ(DeviceNodes::get("Spark"), expected);
@@ -30,7 +30,7 @@ TEST(ParserTest, AliasTest){
         "Person",
         {},
         {
-            {"Contact",{std::make_pair(std::make_shared<Type>(Type::PrimitiveType::INTEGER), 10)}, {}}
+            {"Contact",{std::make_pair(std::make_shared<TypeNode>(TypeNode::PrimitiveType::INTEGER), 10)}, {}}
         },
         {}
     };

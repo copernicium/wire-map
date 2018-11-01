@@ -8,7 +8,7 @@ namespace wiremap::parser{
 		return name;
 	}
 
-	Type ParameterNode::getType()const{
+	TypeNode ParameterNode::getType()const{
 		return type;
 	}
 
@@ -29,7 +29,7 @@ namespace wiremap::parser{
 
         ParameterNode parameter_node;
         parameter_node.name = LINE[LINE.size() - 1];
-        parameter_node.type = Type::parse(subvector(LINE, 1, LINE.size() - 1));
+        parameter_node.type = TypeNode::parse(subvector(LINE, 1, LINE.size() - 1));
 
         return parameter_node;
     }
@@ -50,7 +50,7 @@ namespace wiremap::parser{
 
     ParameterNode::ParameterNode(){}
 
-    ParameterNode::ParameterNode(const std::string& NAME, const Type& TYPE, const std::optional<std::string>& SD, const std::optional<std::string>& SR): name(NAME), type(TYPE), source_device(SD), source_result(SR){}
+    ParameterNode::ParameterNode(const std::string& NAME, const TypeNode& TYPE, const std::optional<std::string>& SD, const std::optional<std::string>& SR): name(NAME), type(TYPE), source_device(SD), source_result(SR){}
 
     bool operator==(const ParameterNode& a, const ParameterNode& b){
         return a.getName() == b.getName() && a.getType() == b.getType() && a.getSourceDevice() == b.getSourceDevice() && a.getSourceResult() == b.getSourceResult();

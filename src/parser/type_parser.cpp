@@ -6,165 +6,165 @@
 #include "util.hpp"
 
 namespace wiremap::parser{
-    std::string asString(const Type::BaseType& IN){
+    std::string asString(const TypeNode::BaseType& IN){
         switch(IN){
-        case Type::BaseType::LIST:
+        case TypeNode::BaseType::LIST:
             return "\"List\"";
-        case Type::BaseType::COLLECTION:
+        case TypeNode::BaseType::COLLECTION:
             return "\"Collection\"";
-        case Type::BaseType::PRIMITIVE:
+        case TypeNode::BaseType::PRIMITIVE:
             return "\"Primitive\"";
         default:
             NYI
         }
     }
 
-    std::string asString(const Type::PrimitiveType& IN){
+    std::string asString(const TypeNode::PrimitiveType& IN){
         switch(IN){
-        case Type::PrimitiveType::BIT:
+        case TypeNode::PrimitiveType::BIT:
             return "\"Bit\"";
-        case Type::PrimitiveType::CHAR:
+        case TypeNode::PrimitiveType::CHAR:
             return "\"Char\"";
-        case Type::PrimitiveType::BYTE:
+        case TypeNode::PrimitiveType::BYTE:
             return "\"Byte\"";
-        case Type::PrimitiveType::WORD:
+        case TypeNode::PrimitiveType::WORD:
             return "\"Word\"";
-        case Type::PrimitiveType::DWORD:
+        case TypeNode::PrimitiveType::DWORD:
             return "\"DWord\"";
-        case Type::PrimitiveType::QWORD:
+        case TypeNode::PrimitiveType::QWORD:
             return "\"QWord\"";
-        case Type::PrimitiveType::INTEGER:
+        case TypeNode::PrimitiveType::INTEGER:
             return "\"Integer\"";
-        case Type::PrimitiveType::BOOL:
+        case TypeNode::PrimitiveType::BOOL:
             return "\"Bool\"";
-        case Type::PrimitiveType::REAL:
+        case TypeNode::PrimitiveType::REAL:
             return "\"Real\"";
         default:
             NYI
         }
     }
 
-    Type::PrimitiveType parsePrimitiveType(const std::string& IN){
+    TypeNode::PrimitiveType parsePrimitiveType(const std::string& IN){
         if(IN == "Bit"){
-            return Type::PrimitiveType::BIT;
+            return TypeNode::PrimitiveType::BIT;
         } else if(IN == "Char"){
-            return Type::PrimitiveType::CHAR;
+            return TypeNode::PrimitiveType::CHAR;
         } else if(IN == "Byte"){
-            return Type::PrimitiveType::BYTE;
+            return TypeNode::PrimitiveType::BYTE;
         } else if(IN == "Word"){
-            return Type::PrimitiveType::WORD;
+            return TypeNode::PrimitiveType::WORD;
         } else if(IN == "DWord"){
-            return Type::PrimitiveType::DWORD;
+            return TypeNode::PrimitiveType::DWORD;
         } else if(IN == "QWord"){
-            return Type::PrimitiveType::QWORD;
+            return TypeNode::PrimitiveType::QWORD;
         } else if(IN == "Integer"){
-            return Type::PrimitiveType::INTEGER;
+            return TypeNode::PrimitiveType::INTEGER;
         } else if(IN == "Bool"){
-            return Type::PrimitiveType::BOOL;
+            return TypeNode::PrimitiveType::BOOL;
         } else if(IN == "Real"){
-            return Type::PrimitiveType::REAL;
+            return TypeNode::PrimitiveType::REAL;
         }
         printf("IN:%s\n",IN.c_str());
         NYI
     }
 
-    Type Type::parseObject(const std::string& PRIMITIVE_TYPE){
-        return Type(parsePrimitiveType(PRIMITIVE_TYPE));
+    TypeNode TypeNode::parseObject(const std::string& PRIMITIVE_TYPE){
+        return TypeNode(parsePrimitiveType(PRIMITIVE_TYPE));
     }
 
-    Type Type::parseList(const std::vector<std::string>& IN){
+    TypeNode TypeNode::parseList(const std::vector<std::string>& IN){
         assert(isList(IN));
 
-        return Type(UnderlyingListType{
-            std::make_shared<Type>(
-                Type::parse(subvector(IN, LIST_SIZE_POS + 1, IN.size()))
+        return TypeNode(UnderlyingListType{
+            std::make_shared<TypeNode>(
+                TypeNode::parse(subvector(IN, LIST_SIZE_POS + 1, IN.size()))
             ),
             std::stoi(IN[LIST_SIZE_POS])
 		});
     }
 
-    Type Type::parseCollection(const std::vector<std::string>& IN){
+    TypeNode TypeNode::parseCollection(const std::vector<std::string>& IN){
         assert(isCollection(IN));
 
-        Type type;
+        TypeNode type;
         type.base_type = BaseType::COLLECTION;
         type.underlying_type = UnderlyingCollectionType();
         unsigned start = CONTAINER_SPECIFIER_POS + 1;
         for(unsigned i = start; i < IN.size(); i++){
             if(IN[i] == COLLECTION_SEPARATOR){
                 std::get<UnderlyingCollectionType>(type.underlying_type).push_back(
-                    std::make_shared<Type>(
-                        Type::parse(subvector(IN, start, i))
+                    std::make_shared<TypeNode>(
+                        TypeNode::parse(subvector(IN, start, i))
                     )
                 );
                 start = i + 1;
             }
         }
         std::get<UnderlyingCollectionType>(type.underlying_type).push_back( //capture last type in collection
-            std::make_shared<Type>(
-                Type::parse(subvector(IN, start, IN.size()))
+            std::make_shared<TypeNode>(
+                TypeNode::parse(subvector(IN, start, IN.size()))
             )
         );
         return type;
     }
 
-    Type::BaseType Type::getBaseType()const{
+    TypeNode::BaseType TypeNode::getBaseType()const{
         return base_type; //TODO replace with type check on underlying_type?
     }
 
-    Type::PrimitiveType Type::getObjectType()const{
+    TypeNode::PrimitiveType TypeNode::getObjectType()const{
         assert(base_type == BaseType::PRIMITIVE);
         return std::get<PrimitiveType>(underlying_type);
     }
 
-    unsigned Type::getListSize()const{
+    unsigned TypeNode::getListSize()const{
         assert(base_type == BaseType::LIST);
         return std::get<UnderlyingListType>(underlying_type).second;
     }
 
-    Type Type::getListType()const{
+    TypeNode TypeNode::getListType()const{
         assert(base_type == BaseType::LIST);
         assert(std::get<UnderlyingListType>(underlying_type).first != nullptr);
         return *(std::get<UnderlyingListType>(underlying_type).first);
     }
 
-    std::vector<Type> Type::getCollectionTypes()const{
+    std::vector<TypeNode> TypeNode::getCollectionTypes()const{
         assert(base_type == BaseType::COLLECTION);
-        std::vector<Type> v;
-        for(const std::shared_ptr<Type>& a: std::get<UnderlyingCollectionType>(underlying_type)){
+        std::vector<TypeNode> v;
+        for(const std::shared_ptr<TypeNode>& a: std::get<UnderlyingCollectionType>(underlying_type)){
             assert(a != nullptr);
             v.push_back(*a);
         }
         return v;
     }
 
-    bool Type::isList(const std::vector<std::string>& IN){
+    bool TypeNode::isList(const std::vector<std::string>& IN){
         return IN.size() > LIST_SIZE_POS && IN[CONTAINER_KEYWORD_POS] == LIST_KEYWORD && IN[CONTAINER_SPECIFIER_POS] == CONTAINER_TYPE_SPECIFIER && isNumber(IN[LIST_SIZE_POS]);
     }
 
-    bool Type::isCollection(const std::vector<std::string>& IN){
+    bool TypeNode::isCollection(const std::vector<std::string>& IN){
         return IN.size() > CONTAINER_SPECIFIER_POS && IN[CONTAINER_KEYWORD_POS] == COLLECTION_KEYWORD && IN[CONTAINER_SPECIFIER_POS] == CONTAINER_TYPE_SPECIFIER;
     }
 
-    Type Type::parse(const std::vector<std::string>& IN){
+    TypeNode TypeNode::parse(const std::vector<std::string>& IN){
         assert(!IN.empty());
 
         if(isCollection(IN)){
-            return Type::parseCollection(IN);
+            return TypeNode::parseCollection(IN);
         } else if(isList(IN)){
-            return Type::parseList(IN);
+            return TypeNode::parseList(IN);
         }
 		if(TypeMap::exists(IN.front())){
 			return TypeMap::get(IN.front());
 		}
-		return Type::parseObject(IN.front());
+		return TypeNode::parseObject(IN.front());
     }
 
-    Type Type::parse(const std::string& in){
+    TypeNode TypeNode::parse(const std::string& in){
         return parse(splitLine(in));
     }
 
-    std::string Type::toString()const{
+    std::string TypeNode::toString()const{
         std::string a = "{";
         a += "\"base_type\":" + asString(getBaseType()) + ", ";
         switch(base_type){
@@ -173,7 +173,7 @@ namespace wiremap::parser{
             a += "\"list_size\":" + std::to_string(getListSize());
             break;
         case BaseType::COLLECTION:
-            a += "\"underlying_type\":" + asString(getCollectionTypes(), &Type::toString);
+            a += "\"underlying_type\":" + asString(getCollectionTypes(), &TypeNode::toString);
             break;
         case BaseType::PRIMITIVE:
             a += "\"underlying_type\":" + asString(getObjectType());
@@ -185,15 +185,15 @@ namespace wiremap::parser{
         return a;
     }
 
-    Type::Type(){}
+    TypeNode::TypeNode(){}
 
-    Type::Type(const PrimitiveType& U): base_type(Type::BaseType::PRIMITIVE), underlying_type(U){}
+    TypeNode::TypeNode(const PrimitiveType& U): base_type(TypeNode::BaseType::PRIMITIVE), underlying_type(U){}
 
-	Type::Type(const UnderlyingListType& U): base_type(Type::BaseType::LIST), underlying_type(U){}
+	TypeNode::TypeNode(const UnderlyingListType& U): base_type(TypeNode::BaseType::LIST), underlying_type(U){}
 
-	Type::Type(const UnderlyingCollectionType& U): base_type(Type::BaseType::COLLECTION), underlying_type(U){}
+	TypeNode::TypeNode(const UnderlyingCollectionType& U): base_type(TypeNode::BaseType::COLLECTION), underlying_type(U){}
 
-    bool operator==(const Type& a, const Type& b){
+    bool operator==(const TypeNode& a, const TypeNode& b){
         if(a.base_type != b.base_type){
             return false;
         }
@@ -201,12 +201,12 @@ namespace wiremap::parser{
             return false;
         }
         switch(a.base_type){
-        case Type::BaseType::PRIMITIVE:
+        case TypeNode::BaseType::PRIMITIVE:
             return a.underlying_type == b.underlying_type;
-        case Type::BaseType::LIST:
+        case TypeNode::BaseType::LIST:
         {
-            Type::UnderlyingListType a_under = std::get<Type::UnderlyingListType>(a.underlying_type);
-            Type::UnderlyingListType b_under = std::get<Type::UnderlyingListType>(b.underlying_type);
+            TypeNode::UnderlyingListType a_under = std::get<TypeNode::UnderlyingListType>(a.underlying_type);
+            TypeNode::UnderlyingListType b_under = std::get<TypeNode::UnderlyingListType>(b.underlying_type);
             if(a_under.second != b_under.second){
                 return false;
             }
@@ -215,10 +215,10 @@ namespace wiremap::parser{
             }
             return a_under.first == b_under.first;
         }
-        case Type::BaseType::COLLECTION:
+        case TypeNode::BaseType::COLLECTION:
         {
-            Type::UnderlyingCollectionType a_under = std::get<Type::UnderlyingCollectionType>(a.underlying_type);
-            Type::UnderlyingCollectionType b_under = std::get<Type::UnderlyingCollectionType>(b.underlying_type);
+            TypeNode::UnderlyingCollectionType a_under = std::get<TypeNode::UnderlyingCollectionType>(a.underlying_type);
+            TypeNode::UnderlyingCollectionType b_under = std::get<TypeNode::UnderlyingCollectionType>(b.underlying_type);
             if(a_under.size() != b_under.size()){
                 return false;
             }
@@ -239,7 +239,7 @@ namespace wiremap::parser{
         }
     }
 
-    bool operator!=(const Type& a, const Type& b){
+    bool operator!=(const TypeNode& a, const TypeNode& b){
         return !(a == b);
     }
 }

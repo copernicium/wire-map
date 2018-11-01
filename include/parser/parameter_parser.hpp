@@ -8,7 +8,7 @@ namespace wiremap::parser{
 	private:
         std::string name;
 
-        Type type;
+        TypeNode type;
 
         std::optional<std::string> source_device; // TODO: since nodes are used to define types, not specific instances, this shouldn't be here
 
@@ -21,7 +21,7 @@ namespace wiremap::parser{
 	public:
 		std::string getName()const;
 
-		Type getType()const;
+		TypeNode getType()const;
 
 		std::optional<std::string> getSourceDevice()const;
 
@@ -37,7 +37,7 @@ namespace wiremap::parser{
 
         ParameterNode();
 
-        ParameterNode(const std::string&, const Type&, const std::optional<std::string>&, const std::optional<std::string>&);
+        ParameterNode(const std::string&, const TypeNode&, const std::optional<std::string>&, const std::optional<std::string>&);
 
 		friend WireMapParser;
     };

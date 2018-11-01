@@ -12,7 +12,7 @@ namespace wiremap::parser{
 
         ObjectNode object_node;
         object_node.name = line[1];
-        object_node.type = Type::parse(subvector(line, 0, line.size() - 1));
+        object_node.type = TypeNode::parse(subvector(line, 0, line.size() - 1));
 
         return object_node;
     }
