@@ -29,21 +29,8 @@ namespace wiremap{
         template<typename T>
         inline constexpr bool is_wiremap_primitive_v = std::is_base_of_v<detail::ObjectBase,T>;
 
-        template<typename T>
-        struct Container: public detail::ObjectBase{
-        protected:
-            T _internal;
-            std::size_t _size;
-
-        public:
-            constexpr std::size_t size()const noexcept{
-                return _size;
-            }
-        };
-
-        template<typename T, auto DefaultValue,  typename... Attributes>
+        template<typename T, auto DefaultValue,  typename... Attributes> // TODO should default value be part of the type definition?
         struct Primitive: public ObjectBase, public Attributes...{
-            static_assert(!detail::is_specialization_of<T, detail::Container>::value, "Primitives are not allowed to be of type detail::Container");
             static_assert(std::is_convertible_v<decltype(DefaultValue),T>, "Default value different than value type");
 
             using value_type = T;
@@ -72,6 +59,18 @@ namespace wiremap{
 				value = inner->get().value;
 				default_value = inner->get().default_value;
 				valid = inner->get().valid;
+			}
+
+			Primitive(const Primitive<T, DefaultValue, Attributes...>& OTHER)noexcept: value(OTHER.value), default_value(OTHER.default_value), valid(OTHER.valid){}
+
+			Primitive<T, DefaultValue, Attributes...> operator=(const Primitive<T, DefaultValue, Attributes...>& OTHER){
+				if(&OTHER == this){
+					return *this;
+				}
+				value = OTHER.value;
+				default_value = OTHER.default_value;
+				valid = OTHER.valid;
+				return *this;
 			}
 
             Primitive()noexcept: default_value(DefaultValue),valid(false){}
@@ -125,7 +124,7 @@ namespace wiremap{
             }
 
             template<typename OpT, auto OpDefaultValue, typename... OpAttributes>
-                friend Primitive<OpT, OpDefaultValue, OpAttributes...> operator*(Primitive<OpT, OpDefaultValue, OpAttributes...>, const Primitive<OpT, OpDefaultValue, OpAttributes...>&);
+				friend Primitive<OpT, OpDefaultValue, OpAttributes...> operator-(Primitive<OpT, OpDefaultValue, OpAttributes...>, const Primitive<OpT, OpDefaultValue, OpAttributes...>&);
 
             Primitive<T, DefaultValue, Attributes...>& operator*=(const Primitive<T, DefaultValue, Attributes...>& B){
                 assert(default_value == B.default_value);
@@ -137,8 +136,8 @@ namespace wiremap{
                 return *this;
             }
 
-            template<typename OpT, auto OpDefaultValue, typename... OpAttributes>
-                friend Primitive<OpT, OpDefaultValue, OpAttributes...> operator/(Primitive<OpT, OpDefaultValue, OpAttributes...>, const Primitive<OpT, OpDefaultValue, OpAttributes...>&);
+			template<typename OpT, auto OpDefaultValue, typename... OpAttributes>
+                friend Primitive<OpT, OpDefaultValue, OpAttributes...> operator*(Primitive<OpT, OpDefaultValue, OpAttributes...>, const Primitive<OpT, OpDefaultValue, OpAttributes...>&);
 
             Primitive<T, DefaultValue, Attributes...>& operator/=(const Primitive<T, DefaultValue, Attributes...>& B){
                 assert(default_value == B.default_value);
@@ -151,9 +150,9 @@ namespace wiremap{
             }
 
             template<typename OpT, auto OpDefaultValue, typename... OpAttributes>
-            friend Primitive<OpT, OpDefaultValue, OpAttributes...> operator-(Primitive<OpT, OpDefaultValue, OpAttributes...>, const Primitive<OpT, OpDefaultValue, OpAttributes...>&);
+                friend Primitive<OpT, OpDefaultValue, OpAttributes...> operator/(Primitive<OpT, OpDefaultValue, OpAttributes...>, const Primitive<OpT, OpDefaultValue, OpAttributes...>&);
 
-            bool operator==(const Primitive<T,DefaultValue,Attributes...>& B){
+            bool operator==(const Primitive<T,DefaultValue,Attributes...>& B)const{
                 if(default_value != B.default_value){
                     return false;
                 }
@@ -166,53 +165,33 @@ namespace wiremap{
                 return true;
             }
 
-            bool operator!=(const Primitive<T,DefaultValue,Attributes...>& B){
+            bool operator!=(const Primitive<T,DefaultValue,Attributes...>& B)const{
                 return !(*this == B);
             }
         };
 
         template<typename T, auto DefaultValue, typename... Attributes>
         Primitive<T, DefaultValue, Attributes...> operator+(Primitive<T, DefaultValue, Attributes...> a, const Primitive<T, DefaultValue, Attributes...>& B){
-            assert(a.default_value == B.default_value);
-            if(!a.valid || !B.valid){
-                a.valid = false;
-                return a;
-            }
-            a.value = a.value + B.value;
-            return a;
+			a += B;
+			return a;
         }
 
         template<typename T, auto DefaultValue, typename... Attributes>
         Primitive<T, DefaultValue, Attributes...> operator-(Primitive<T, DefaultValue, Attributes...> a, const Primitive<T, DefaultValue, Attributes...>& B){
-            assert(a.default_value == B.default_value);
-            if(!a.valid || !B.valid){
-                a.valid = false;
-                return a;
-            }
-            a.value = a.value - B.value;
-            return a;
+			a -= B;
+			return a;
         }
 
         template<typename T, auto DefaultValue, typename... Attributes>
         Primitive<T, DefaultValue, Attributes...> operator*(Primitive<T, DefaultValue, Attributes...> a, const Primitive<T, DefaultValue, Attributes...>& B){
-            assert(a.default_value == B.default_value);
-            if(!a.valid || !B.valid){
-                a.valid = false;
-                return a;
-            }
-            a.value = a.value * B.value;
-            return a;
+			a *= B;
+			return a;
         }
 
         template<typename T, auto DefaultValue, typename... Attributes>
         Primitive<T, DefaultValue, Attributes...> operator/(Primitive<T, DefaultValue, Attributes...> a, const Primitive<T, DefaultValue, Attributes...>& B){
-            assert(a.default_value == B.default_value);
-            if(!a.valid || !B.valid){
-                a.valid = false;
-                return a;
-            }
-            a.value = a.value / B.value;
-            return a;
+			a /= B;
+			return a;
         }
 
         template<typename T>

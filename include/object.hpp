@@ -232,6 +232,21 @@ namespace wiremap{
 			}
 		}
 
+		Object& operator=(const Object& OTHER){
+			if(&OTHER == this){
+				return *this;
+			}
+			type = OTHER.type;
+			TypeInterface::reset(type, value);
+			if(type == Type::CONTAINER){
+				std::get<TypeInterface::element<Type::CONTAINER>>(value).reserve(OTHER.size());
+				for(unsigned i = 0; i < OTHER.size(); i++){
+					std::get<TypeInterface::element<Type::CONTAINER>>(value).push_back(OTHER.at(i).clone());
+				}
+			}
+			return *this;
+		}
+
 		//Explicit constructors
 
 		static Object primitive(const Type& TYPE)noexcept{
