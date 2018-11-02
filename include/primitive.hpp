@@ -22,7 +22,7 @@ namespace wiremap{
     }
 
     namespace detail{
-        struct ObjectBase{
+        struct ObjectBase{ // TODO remove probably
             virtual ~ObjectBase() = default;
         };
 
@@ -41,7 +41,7 @@ namespace wiremap{
             bool valid;
 
         public:
-            Primitive(const T& v, const T& default_v)noexcept: value(v), default_value(default_v),valid(true){
+			Primitive(const T& v, const T& default_v)noexcept: value(v), default_value(default_v), valid(true){
                 attributes::Attribute<T,Attributes...>::verify(value);
                 attributes::Attribute<T,Attributes...>::verify(default_value);
             }
@@ -59,18 +59,6 @@ namespace wiremap{
 				value = inner->get().value;
 				default_value = inner->get().default_value;
 				valid = inner->get().valid;
-			}
-
-			Primitive(const Primitive<T, DefaultValue, Attributes...>& OTHER)noexcept: value(OTHER.value), default_value(OTHER.default_value), valid(OTHER.valid){}
-
-			Primitive<T, DefaultValue, Attributes...> operator=(const Primitive<T, DefaultValue, Attributes...>& OTHER){
-				if(&OTHER == this){
-					return *this;
-				}
-				value = OTHER.value;
-				default_value = OTHER.default_value;
-				valid = OTHER.valid;
-				return *this;
 			}
 
             Primitive()noexcept: default_value(DefaultValue),valid(false){}

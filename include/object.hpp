@@ -60,73 +60,61 @@ namespace wiremap{
 			using variant = std::variant<Types...>;
 
 			template<typename T>
-			static void assign(const Type& TYPE, variant& v, const T& VALUE){
+			static variant create(const Type& TYPE, const T& VALUE)noexcept{
 				switch(TYPE){
 				case Type::BIT:
-					v = (element<Type::BIT>)VALUE;
-					return;;
+					return (element<Type::BIT>)VALUE;
 				case Type::CHAR:
-					v = (element<Type::CHAR>)VALUE;
-					return;;
+					return (element<Type::CHAR>)VALUE;
 				case Type::BYTE:
-					v = (element<Type::BYTE>)VALUE;
-					return;;
+					return (element<Type::BYTE>)VALUE;
 				case Type::WORD:
-					v = (element<Type::WORD>)VALUE;
-					return;;
+					return (element<Type::WORD>)VALUE;
 				case Type::DWORD:
-					v = (element<Type::DWORD>)VALUE;
-					return;;
+					return (element<Type::DWORD>)VALUE;
 				case Type::QWORD:
-					v = (element<Type::QWORD>)VALUE;
-					return;;
+					return (element<Type::QWORD>)VALUE;
 				case Type::INTEGER:
-					v = (element<Type::INTEGER>)VALUE;
-					return;;
+					return (element<Type::INTEGER>)VALUE;
 				case Type::BOOL:
-					v = (element<Type::BOOL>)VALUE;
-					return;;
+					return (element<Type::BOOL>)VALUE;
 				case Type::REAL:
-					v = (element<Type::REAL>)VALUE;
-					return;
+					return (element<Type::REAL>)VALUE;
 				case Type::CONTAINER:
-					v = (element<Type::CONTAINER>)VALUE;
-					return;
+					return (element<Type::CONTAINER>)VALUE;
 				case Type::UNKNOWN:
-					[[fallthrough]]; // Undefined
+					assert(0);; // Undefined
 				default:
-					assert(0);
+					NYI
 				}
 			}
 
-			static void reset(const Type& TYPE, variant& v){
+			static variant create(const Type& TYPE)noexcept{
 				switch(TYPE){
 				case Type::BIT:
-					[[fallthrough]];
+					return element<Type::BIT>();
 				case Type::CHAR:
-					[[fallthrough]];
+					return element<Type::CHAR>();
 				case Type::BYTE:
-					[[fallthrough]];
+					return element<Type::BYTE>();
 				case Type::WORD:
-					[[fallthrough]];
+					return element<Type::WORD>();
 				case Type::DWORD:
-					[[fallthrough]];
+					return element<Type::DWORD>();
 				case Type::QWORD:
-					[[fallthrough]];
+					return element<Type::QWORD>();
 				case Type::INTEGER:
-					[[fallthrough]];
+					return element<Type::INTEGER>();
 				case Type::BOOL:
-					[[fallthrough]];
+					return element<Type::BOOL>();
 				case Type::REAL:
-					assign(TYPE, v, 0);
-					return;
+					return element<Type::REAL>();
 				case Type::CONTAINER:
-					v = element<Type::CONTAINER>();
-					return;
+					return element<Type::CONTAINER>();
 				case Type::UNKNOWN:
-					[[fallthrough]]; // Undefined
+					assert(0); // Undefined
 				default:
-					assert(0);
+					NYI
 				}
 			}
 
@@ -150,7 +138,7 @@ namespace wiremap{
 
 		public:
 			template<typename T>
-			static Type deduce(const T&){
+			static Type deduce(const T&)noexcept{
 				return index<T, Types...>::found ? static_cast<Type>(index<T, Types...>::value) : Type::UNKNOWN;
 			}
 		};
@@ -169,19 +157,8 @@ namespace wiremap{
 		Integer,
 		Bool,
 		Real,
-		std::vector<std::shared_ptr<Object>>
+		std::vector<std::shared_ptr<Object>> // TODO: use unique_ptr?
 	>;
-
-    // Visitor (declared here to use in Object class)
-
-	struct Assign{
-        template<typename T, typename R, typename = std::enable_if_t<detail::is_wiremap_primitive_v<T>>>
-		void operator()(const Type&, T& a, const R& b)const noexcept{
-			a = b;
-		}
-	};
-
-	Assign assign;
 
 	// The class that will actually be used during operation; can contain primitives, lists, and collections; types determined during runtime
 	struct Object{
@@ -194,15 +171,10 @@ namespace wiremap{
 
 		Object() = delete;
 
-		Object(const Type& TYPE)noexcept: type(TYPE){
-			assert(type != Type::UNKNOWN);
-			TypeInterface::reset(type, value);
-		}
+		Object(const Type& TYPE)noexcept: type(TYPE), value(TypeInterface::create(type)){}
 
 		template<typename T>
-		Object(const Type& TYPE, const T& VALUE)noexcept: Object(TYPE){
-			TypeInterface::assign(type, value, VALUE);
-		}
+		Object(const Type& TYPE, const T& VALUE)noexcept: type(TYPE), value(TypeInterface::create(type, VALUE)){}
 
 		Object(const Object& TYPE, const std::size_t& SIZE)noexcept: Object(Type::CONTAINER){
 			std::get<TypeInterface::element<Type::CONTAINER>>(value).reserve(SIZE);
@@ -214,36 +186,41 @@ namespace wiremap{
 		Object(const std::vector<Object>& TYPES)noexcept: Object(Type::CONTAINER){
 			std::get<TypeInterface::element<Type::CONTAINER>>(value).reserve(TYPES.size());
 			for(unsigned i = 0; i < TYPES.size(); i++){
-				std::get<TypeInterface::element<Type::CONTAINER>>(value).push_back(TYPES[i].clone());
+				std::get<TypeInterface::element<Type::CONTAINER>>(value).push_back(TYPES.at(i).clone());
 			}
 		}
 
 	public:
-		~Object() = default;
+		~Object()noexcept = default;
 
-		Object(Object&&) = default;
+		Object(Object&&)noexcept = default;
 
-		Object(const Object& OTHER)noexcept: Object(OTHER.type){
+		Object(const Object& OTHER)noexcept: type(OTHER.type), value(OTHER.value){
 			if(type == Type::CONTAINER){
-				std::get<TypeInterface::element<Type::CONTAINER>>(value).reserve(OTHER.size());
-				for(unsigned i = 0; i < OTHER.size(); i++){
-					std::get<TypeInterface::element<Type::CONTAINER>>(value).push_back(OTHER.at(i).clone());
+				for(unsigned i = 0; i < size(); i++){
+					std::get<TypeInterface::element<Type::CONTAINER>>(value).at(i) = OTHER.at(i).clone();
 				}
 			}
 		}
 
-		Object& operator=(const Object& OTHER){
+		Object& operator=(const Object& OTHER)noexcept{
 			if(&OTHER == this){
 				return *this;
 			}
 			type = OTHER.type;
-			TypeInterface::reset(type, value);
+			value = OTHER.value;
 			if(type == Type::CONTAINER){
-				std::get<TypeInterface::element<Type::CONTAINER>>(value).reserve(OTHER.size());
-				for(unsigned i = 0; i < OTHER.size(); i++){
-					std::get<TypeInterface::element<Type::CONTAINER>>(value).push_back(OTHER.at(i).clone());
+				for(unsigned i = 0; i < size(); i++){
+					std::get<TypeInterface::element<Type::CONTAINER>>(value).at(i) = OTHER.at(i).clone();
 				}
 			}
+			return *this;
+		}
+
+		Object& operator=(Object&& other)noexcept{
+			assert(&other != this);
+			type = std::move(other.type);
+			value = std::move(other.value);
 			return *this;
 		}
 
@@ -313,29 +290,29 @@ namespace wiremap{
 
 			switch(a.getType()){
 			case Type::BIT:
-				return f(a.getType(), std::get<TypeInterface::element<Type::BIT>>(a.value), std::get<TypeInterface::element<Type::BIT>>(b.value), args...);
+				return f(std::get<TypeInterface::element<Type::BIT>>(a.value), std::get<TypeInterface::element<Type::BIT>>(b.value), args...);
 			case Type::CHAR:
-				return f(a.getType(), std::get<TypeInterface::element<Type::CHAR>>(a.value), std::get<TypeInterface::element<Type::CHAR>>(b.value), args...);
+				return f(std::get<TypeInterface::element<Type::CHAR>>(a.value), std::get<TypeInterface::element<Type::CHAR>>(b.value), args...);
 			case Type::BYTE:
-				return f(a.getType(), std::get<TypeInterface::element<Type::BYTE>>(a.value), std::get<TypeInterface::element<Type::BYTE>>(b.value), args...);
+				return f(std::get<TypeInterface::element<Type::BYTE>>(a.value), std::get<TypeInterface::element<Type::BYTE>>(b.value), args...);
 			case Type::WORD:
-				return f(a.getType(), std::get<TypeInterface::element<Type::WORD>>(a.value), std::get<TypeInterface::element<Type::WORD>>(b.value), args...);
+				return f(std::get<TypeInterface::element<Type::WORD>>(a.value), std::get<TypeInterface::element<Type::WORD>>(b.value), args...);
 			case Type::DWORD:
-				return f(a.getType(), std::get<TypeInterface::element<Type::DWORD>>(a.value), std::get<TypeInterface::element<Type::DWORD>>(b.value), args...);
+				return f(std::get<TypeInterface::element<Type::DWORD>>(a.value), std::get<TypeInterface::element<Type::DWORD>>(b.value), args...);
 			case Type::QWORD:
-				return f(a.getType(), std::get<TypeInterface::element<Type::QWORD>>(a.value), std::get<TypeInterface::element<Type::QWORD>>(b.value), args...);
+				return f(std::get<TypeInterface::element<Type::QWORD>>(a.value), std::get<TypeInterface::element<Type::QWORD>>(b.value), args...);
 			case Type::INTEGER:
-				return f(a.getType(), std::get<TypeInterface::element<Type::INTEGER>>(a.value), std::get<TypeInterface::element<Type::INTEGER>>(b.value), args...);
+				return f(std::get<TypeInterface::element<Type::INTEGER>>(a.value), std::get<TypeInterface::element<Type::INTEGER>>(b.value), args...);
 			case Type::BOOL:
-				return f(a.getType(), std::get<TypeInterface::element<Type::BOOL>>(a.value), std::get<TypeInterface::element<Type::BOOL>>(b.value), args...);
+				return f(std::get<TypeInterface::element<Type::BOOL>>(a.value), std::get<TypeInterface::element<Type::BOOL>>(b.value), args...);
 			case Type::REAL:
-				return f(a.getType(), std::get<TypeInterface::element<Type::REAL>>(a.value), std::get<TypeInterface::element<Type::REAL>>(b.value), args...);
+				return f(std::get<TypeInterface::element<Type::REAL>>(a.value), std::get<TypeInterface::element<Type::REAL>>(b.value), args...);
 			case Type::CONTAINER:
 				[[fallthrough]]; // Undefined
 			case Type::UNKNOWN:
-				[[fallthrough]]; // Undefined
+				assert(0); // Undefined
 			default:
-				assert(0);
+				NYI
 			}
 		}
 
@@ -343,29 +320,29 @@ namespace wiremap{
 		static auto visit(const F& f, TObject& a, const Args&... args){
 			switch(a.getType()){
 			case Type::BIT:
-				return f(a.getType(), std::get<TypeInterface::element<Type::BIT>>(a.value), args...);
+				return f(std::get<TypeInterface::element<Type::BIT>>(a.value), args...);
 			case Type::CHAR:
-				return f(a.getType(), std::get<TypeInterface::element<Type::CHAR>>(a.value), args...);
+				return f(std::get<TypeInterface::element<Type::CHAR>>(a.value), args...);
 			case Type::BYTE:
-				return f(a.getType(), std::get<TypeInterface::element<Type::BYTE>>(a.value), args...);
+				return f(std::get<TypeInterface::element<Type::BYTE>>(a.value), args...);
 			case Type::WORD:
-				return f(a.getType(), std::get<TypeInterface::element<Type::WORD>>(a.value), args...);
+				return f(std::get<TypeInterface::element<Type::WORD>>(a.value), args...);
 			case Type::DWORD:
-				return f(a.getType(), std::get<TypeInterface::element<Type::DWORD>>(a.value), args...);
+				return f(std::get<TypeInterface::element<Type::DWORD>>(a.value), args...);
 			case Type::QWORD:
-				return f(a.getType(), std::get<TypeInterface::element<Type::QWORD>>(a.value), args...);
+				return f(std::get<TypeInterface::element<Type::QWORD>>(a.value), args...);
 			case Type::INTEGER:
-				return f(a.getType(), std::get<TypeInterface::element<Type::INTEGER>>(a.value), args...);
+				return f(std::get<TypeInterface::element<Type::INTEGER>>(a.value), args...);
 			case Type::BOOL:
-				return f(a.getType(), std::get<TypeInterface::element<Type::BOOL>>(a.value), args...);
+				return f(std::get<TypeInterface::element<Type::BOOL>>(a.value), args...);
 			case Type::REAL:
-				return f(a.getType(), std::get<TypeInterface::element<Type::REAL>>(a.value), args...);
+				return f(std::get<TypeInterface::element<Type::REAL>>(a.value), args...);
 			case Type::CONTAINER:
 				[[fallthrough]]; // Undefined
 			case Type::UNKNOWN:
-				[[fallthrough]]; // Undefined
+				assert(0); // Undefined
 			default:
-				assert(0);
+				NYI
 			}
 		}
 	};
