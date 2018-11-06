@@ -48,6 +48,7 @@ namespace wiremap::parser{
 				}
 
 				for(const ParameterNode& PARAM: DeviceNodes::get(device_type_name).getParameters()){
+					(void)PARAM;
 					// WireMap::get(device_type_name).add();
 				}
             }

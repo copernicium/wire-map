@@ -49,8 +49,6 @@ namespace wiremap{
 		CONTAINER
 	};
 
-	Type toType(const std::string&);
-
 	namespace detail{
 		template<typename... Types>
 		struct TypeInterfaceImpl{
@@ -171,65 +169,29 @@ namespace wiremap{
 
 		Object() = delete;
 
-		Object(const Type& TYPE)noexcept: type(TYPE), value(TypeInterface::create(type)){}
+		Object(const Type&)noexcept;
 
 		template<typename T>
 		Object(const Type& TYPE, const T& VALUE)noexcept: type(TYPE), value(TypeInterface::create(type, VALUE)){}
 
-		Object(const Object& TYPE, const std::size_t& SIZE)noexcept: Object(Type::CONTAINER){
-			std::get<TypeInterface::element<Type::CONTAINER>>(value).reserve(SIZE);
-			for(unsigned i = 0; i < SIZE; i++){
-				std::get<TypeInterface::element<Type::CONTAINER>>(value).push_back(TYPE.clone());
-			}
-		}
+		Object(const Object&, const std::size_t&)noexcept;
 
-		Object(const std::vector<Object>& TYPES)noexcept: Object(Type::CONTAINER){
-			std::get<TypeInterface::element<Type::CONTAINER>>(value).reserve(TYPES.size());
-			for(unsigned i = 0; i < TYPES.size(); i++){
-				std::get<TypeInterface::element<Type::CONTAINER>>(value).push_back(TYPES.at(i).clone());
-			}
-		}
+		Object(const std::vector<Object>& TYPES)noexcept;
 
 	public:
 		~Object()noexcept = default;
 
 		Object(Object&&)noexcept = default;
 
-		Object(const Object& OTHER)noexcept: type(OTHER.type), value(OTHER.value){
-			if(type == Type::CONTAINER){
-				for(unsigned i = 0; i < size(); i++){
-					std::get<TypeInterface::element<Type::CONTAINER>>(value).at(i) = OTHER.at(i).clone();
-				}
-			}
-		}
+		Object(const Object&)noexcept;
 
-		Object& operator=(const Object& OTHER)noexcept{
-			if(&OTHER == this){
-				return *this;
-			}
-			type = OTHER.type;
-			value = OTHER.value;
-			if(type == Type::CONTAINER){
-				for(unsigned i = 0; i < size(); i++){
-					std::get<TypeInterface::element<Type::CONTAINER>>(value).at(i) = OTHER.at(i).clone();
-				}
-			}
-			return *this;
-		}
+		Object& operator=(const Object&)noexcept;
 
-		Object& operator=(Object&& other)noexcept{
-			assert(&other != this);
-			type = std::move(other.type);
-			value = std::move(other.value);
-			return *this;
-		}
+		Object& operator=(Object&&)noexcept;
 
 		//Explicit constructors
 
-		static Object primitive(const Type& TYPE)noexcept{
-			assert(TYPE != Type::CONTAINER);
-			return Object(TYPE);
-		}
+		static Object primitive(const Type&)noexcept;
 
 		template<typename T>
 		static Object primitive(const T& VALUE)noexcept{
@@ -244,43 +206,26 @@ namespace wiremap{
 			return Object(TYPE, VALUE);
 		}
 
-		static Object list(const Object& TYPE, const std::size_t& SIZE)noexcept{
-			return Object(TYPE, SIZE);
-		}
+		static Object list(const Object&, const std::size_t&)noexcept;
 
-		static Object collection(const std::vector<Object>& TYPES)noexcept{
-			return Object(TYPES);
-		}
+		static Object collection(const std::vector<Object>&)noexcept;
 
-		std::shared_ptr<Object> clone()const noexcept{
-			return std::make_shared<Object>(*this);
-		}
+		std::shared_ptr<Object> clone()const noexcept;
 
 		template<typename... Args>
-		static std::shared_ptr<Object> create(const Args&... ARGS)noexcept{
+		std::shared_ptr<Object> create(const Args&... ARGS)noexcept{
 			return std::make_shared<Object>(Object(ARGS...));
 		}
 
 		// Accessors
 
-		const Type& getType()const noexcept{
-			return type;
-		}
+		const Type& getType()const noexcept;
 
-		Object& at(const std::size_t& I){
-			assert(type == Type::CONTAINER);
-			return *(std::get<TypeInterface::element<Type::CONTAINER>>(value)).at(I);
-		}
+		Object& at(const std::size_t&);
 
-		const Object& at(const std::size_t& I)const{
-			assert(type == Type::CONTAINER);
-			return *(std::get<TypeInterface::element<Type::CONTAINER>>(value)).at(I);
-		}
+		const Object& at(const std::size_t&)const;
 
-		std::size_t size()const noexcept{
-			assert(type == Type::CONTAINER);
-			return std::get<TypeInterface::element<Type::CONTAINER>>(value).size();
-		}
+		std::size_t size()const noexcept;
 
 		// Visit functions
 

@@ -22,7 +22,7 @@ SET(CMAKE_CXX_COMPILER g++)
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -pedantic -Wextra -std=c++17")
 
 IF(BUILD_TYPE MATCHES "^[Rr][Ee][Ll][Ee][Aa][Ss][Ee]")
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Werror")
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -flto -Werror")
 ELSE()
   IF(NOT BUILD_TYPE MATCHES "^[Dd][Ee][Bb][Uu][Gg]")
     MESSAGE(WARNING "No build type specified; defaulting to debug")

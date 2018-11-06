@@ -237,7 +237,7 @@ TEST(PrimitiveTest, AccessTest){
 struct ExpectEq{
 	template<typename T, typename R, typename = std::enable_if_t<detail::is_wiremap_primitive_v<T>>>
 	void operator()(const T& a, const R& b)const{
-		EXPECT_EQ(a.get(), b);
+		EXPECT_EQ(a.require(), b);
 		bool same_type = std::is_same_v<typename T::value_type, R>;
 		EXPECT_EQ(same_type, true);
 	}
@@ -246,8 +246,7 @@ struct ExpectEq{
 ExpectEq expect_eq;
 
 TEST(ObjectTest, Constructor){
-	std::string type_str = "Real";
-	Type TYPE = toType(type_str);
+	Type TYPE = Type::REAL;
 
 	Object a = Object::primitive(TYPE);
 	Object::visit(assign, a, 5);
