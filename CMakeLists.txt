@@ -68,11 +68,11 @@ TARGET_LINK_LIBRARIES(parser stdc++fs)
 # Wire-Map Library
 
 ADD_LIBRARY(wiremap SHARED
-  src/init.cpp
   src/object.cpp
   src/result.cpp
   src/parameter.cpp
-  src/device.cpp)
+  src/device.cpp
+  src/wiremap.cpp)
 
 ADD_DEPENDENCIES(wiremap sparsehash)
 

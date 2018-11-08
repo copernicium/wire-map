@@ -3,10 +3,10 @@
 #include "parameter.hpp"
 #include "result.hpp"
 #include "object.hpp"
+#include "visitors.hpp"
 #include "wiremap.hpp"
 
 using namespace wiremap;
-
 
 void setup_sample_wiremap(){
 	WireMap::reset();
@@ -93,7 +93,7 @@ static void BM_ParameterAccess(benchmark::State& state) {
         Parameter p = {"roborio", "pulse_width_1"};
         Object r2 = p.get();
 
-        // printf("value:%ld \n",r2.require());
+		// std::cout << "value: "<<Object::visit(to_string, r2) << "\n";
     }
 }
 

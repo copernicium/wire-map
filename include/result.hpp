@@ -3,8 +3,8 @@
 #include <functional> //TODO remove
 #include "device_bases.hpp"
 #include "function.hpp"
+#include "map_util.hpp"
 #include "object.hpp"
-#include "device.hpp"
 
 // A Result is a function that generates its output using a set of Parameters within the same device as it
 namespace wiremap{
@@ -28,7 +28,7 @@ namespace wiremap{
 
 		friend bool deepCompare(const Result&, const Result&);
 
-        friend Device;
+        friend struct Device;
     };
 
     bool operator==(const Result&, const Result&);

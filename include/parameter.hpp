@@ -1,8 +1,9 @@
 #pragma once
 
 #include "device_bases.hpp"
-#include "wiremap.hpp"
+#include "map_util.hpp"
 #include "result.hpp"
+#include "wiremap.hpp"
 
 // A Parameter is a constant pointer to the value of a Result in the WireMap
 namespace wiremap{
@@ -20,7 +21,5 @@ namespace wiremap{
         Parameter() = delete;
 
         const Object& get()noexcept;
-
-        friend struct Result;
     };
 }

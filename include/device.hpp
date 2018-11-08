@@ -2,6 +2,7 @@
 
 #include <memory>
 #include "device_bases.hpp"
+#include "map_util.hpp"
 
 namespace wiremap{
 	struct Parameter; // TODO necessary?
