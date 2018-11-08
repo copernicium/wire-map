@@ -25,7 +25,7 @@ namespace wiremap{
 		}
 	}
 
-	Object& Object::operator=(const Object& OTHER)noexcept{
+	Object& Object::operator=(const Object& OTHER)noexcept{ // TODO ensure underlying types are same?
 		if(&OTHER == this){
 			return *this;
 		}
@@ -80,5 +80,9 @@ namespace wiremap{
 	std::size_t Object::size()const noexcept{
 		assert(type == Type::CONTAINER);
 		return std::get<TypeInterface::element<Type::CONTAINER>>(value).size();
+	}
+
+	bool Object::operator==(const Object& B)const{
+		return type == B.type && value == B.value;
 	}
 }

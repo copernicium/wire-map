@@ -8,7 +8,7 @@ namespace wiremap{
 		}
 	};
 
-	Assign assign;
+	const Assign assign;
 
 	struct ToString{
 		template<typename T, typename = std::enable_if_t<detail::is_wiremap_primitive_v<T>>>
@@ -17,7 +17,7 @@ namespace wiremap{
 		}
 	};
 
-	ToString toString;
+	const ToString to_string;
 
 	struct Sum{
 		template<typename T, typename = std::enable_if_t<detail::is_wiremap_primitive_v<T>>>
@@ -31,5 +31,14 @@ namespace wiremap{
 		}
 	};
 
-	Sum sum;
+	const Sum sum;
+
+	struct CompareEqual{
+		template<typename T, typename = std::enable_if_t<detail::is_wiremap_primitive_v<T>>>
+		bool operator()(const T& a, const T& b)const{
+			return a == b;
+		}
+	};
+
+	const CompareEqual compare_equal;
 }

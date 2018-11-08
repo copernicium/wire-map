@@ -10,7 +10,7 @@ using namespace wiremap;
 
 void setup_sample_wiremap(){
 	WireMap::reset();
-	Result<Integer> r= std::function<Integer(void)>([]{ return 5; });
+    Result r = std::function<Object(void)>([]{ return Object::primitive((Integer)5); });
     WireMap::add(
         "roborio",
         std::make_pair("pulse_width_1",r)
@@ -20,7 +20,7 @@ void setup_sample_wiremap(){
 static void BM_ParameterConstructor(benchmark::State& state) {
 	setup_sample_wiremap();
 	for(auto _ : state){
-        Parameter<Integer> p = {"roborio", "pulse_width_1"};
+        Parameter p = {"roborio", "pulse_width_1"};
     }
 }
 
@@ -32,7 +32,7 @@ static void BM_ConstantConstructor(benchmark::State& state) {
 
 static void BM_ResultConstructor(benchmark::State& state) {
     for(auto _ : state){
-        Result<Integer> r = std::function<Integer(void)>([]{ return 5; });
+		Result r = std::function<Object(void)>([]{ return Object::primitive((Integer)5); });
     }
 }
 
@@ -43,7 +43,7 @@ static void BM_DeviceConstructor0(benchmark::State& state) {
 }
 
 static void BM_DeviceConstructor1(benchmark::State& state) {
-    Parameter<Integer> p = {"roborio", "pulse_width_1"};
+    Parameter p = {"roborio", "pulse_width_1"};
 	auto member = std::make_pair("pulse_width_1",p);
 
     for(auto _ : state){
@@ -56,10 +56,10 @@ static void BM_DeviceConstructor1(benchmark::State& state) {
 
 static void BM_DeviceConstructor2(benchmark::State& state) {
 	setup_sample_wiremap();
-    Parameter<Integer> p = {"roborio", "pulse_width_1"};
+    Parameter p = {"roborio", "pulse_width_1"};
 	auto member1 = std::make_pair("pulse_width_1",p);
 
-	Result<Integer> r = std::function<Integer(void)>([]{ return 5; });
+	Result r = std::function<Object(void)>([]{ return Object::primitive((Integer)5); });
 	auto member2 = std::make_pair("current",r);
 
     for(auto _ : state){
@@ -74,7 +74,7 @@ static void BM_DeviceConstructor2(benchmark::State& state) {
 static void BM_DeviceSetup(benchmark::State& state) {
     unsigned i = 0;
     for(auto _ : state){
-        Result<Integer> r = std::function<Integer(void)>([]{ return 5; });
+		Result r = std::function<Object(void)>([]{ return Object::primitive((Integer)5); });
 
         WireMap::add(
             "spark" + std::to_string(i),
@@ -90,8 +90,8 @@ static void BM_ParameterAccess(benchmark::State& state) {
 	setup_sample_wiremap();
 
     for(auto _ : state){
-        Parameter<Integer> p = {"roborio", "pulse_width_1"};
-        Integer r2 = p.get();
+        Parameter p = {"roborio", "pulse_width_1"};
+        Object r2 = p.get();
 
         // printf("value:%ld \n",r2.require());
     }

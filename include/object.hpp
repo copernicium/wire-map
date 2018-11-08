@@ -290,5 +290,7 @@ namespace wiremap{
 				NYI
 			}
 		}
+
+		bool operator==(const Object&)const;
 	};
 }

@@ -1,36 +1,26 @@
 #pragma once
 
-#include <memory>
 #include "device_bases.hpp"
 #include "wiremap.hpp"
 #include "result.hpp"
 
 // A Parameter is a constant pointer to the value of a Result in the WireMap
 namespace wiremap{
-    template<typename T>
-    struct Parameter: public detail::ParameterBase{
+    struct Parameter: public detail::DeviceMemberBase{
     private:
 		detail::KeyType source_device_key;
 		detail::KeyType source_result_key;
-		std::shared_ptr<Result<T>> source;
+		std::shared_ptr<Result> source;
 
     public:
-        Parameter(const detail::KeyType& device_key, const detail::KeyType& result_key)noexcept: source_device_key(device_key), source_result_key(result_key), source(nullptr){}
+        Parameter(const detail::KeyType&, const detail::KeyType&)noexcept;
 
-        Parameter(const std::string& d_src, const std::string& r_src)noexcept: Parameter(hashstr(d_src),hashstr(r_src)){}
+        Parameter(const std::string&, const std::string&)noexcept;
 
         Parameter() = delete;
 
-        const T& get()noexcept{
-			if(source == nullptr){
-				source = std::dynamic_pointer_cast<Result<T>>(
-					WireMap::get(source_device_key).getResult(source_result_key)
-				);
-			}
-			return source->get();
-        }
+        const Object& get()noexcept;
 
-        template<typename>
         friend struct Result;
     };
 }

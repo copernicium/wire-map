@@ -3,7 +3,6 @@
 #include <cassert>
 #include <iostream>
 #include "util.hpp"
-#include "parameter.hpp"
 
 namespace wiremap{
     namespace attributes{
@@ -22,15 +21,10 @@ namespace wiremap{
     }
 
     namespace detail{
-        struct ObjectBase{ // TODO remove probably
-            virtual ~ObjectBase() = default;
-        };
-
-        template<typename T>
-        inline constexpr bool is_wiremap_primitive_v = std::is_base_of_v<detail::ObjectBase,T>;
+		struct PrimitiveBase{};
 
         template<typename T, auto DefaultValue,  typename... Attributes> // TODO should default value be part of the type definition?
-        struct Primitive: public ObjectBase, public Attributes...{
+        struct Primitive: public PrimitiveBase, public Attributes...{
             static_assert(std::is_convertible_v<decltype(DefaultValue),T>, "Default value different than value type");
 
             using value_type = T;
@@ -47,19 +41,6 @@ namespace wiremap{
             }
 
             Primitive(const T& v)noexcept: Primitive(v, DefaultValue){}
-
-			Primitive(const std::shared_ptr<ParameterBase>& parameter){
-				if(parameter == nullptr){
-					assert(0);
-				}
-				std::shared_ptr<Parameter<Primitive<T, DefaultValue, Attributes...>>> inner = std::dynamic_pointer_cast<Parameter<Primitive<T, DefaultValue, Attributes...>>>(parameter);
-				if(inner == nullptr){
-					assert(0);
-				}
-				value = inner->get().value;
-				default_value = inner->get().default_value;
-				valid = inner->get().valid;
-			}
 
             Primitive()noexcept: default_value(DefaultValue),valid(false){}
 
@@ -182,12 +163,9 @@ namespace wiremap{
 			return a;
         }
 
-        template<typename T>
-        struct is_object_specialization: public std::false_type{};
-
-        template<typename T, auto D, typename... Attributes>
-        struct is_object_specialization<Primitive<T, D, Attributes...>>: public std::true_type{};
-    }
+		template<typename T>
+		inline constexpr bool is_wiremap_primitive_v = std::is_base_of_v<PrimitiveBase, T>;
+	}
 
     namespace attributes{
         template<typename T>

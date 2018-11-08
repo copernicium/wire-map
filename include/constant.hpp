@@ -5,7 +5,7 @@
 // A Constant is a constant value
 namespace wiremap{
     template<typename T>
-    struct Constant: public detail::ObjectBase, public detail::ConstantBase{
+    struct Constant: public detail::ConstantBase{ // TODO re-imagine in terms of Object
         static_assert(detail::is_wiremap_primitive_v<T>,"Constant built from type not derived from detail::ObjectBase");
 
     private:
