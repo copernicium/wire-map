@@ -8,10 +8,10 @@
 
 using namespace wiremap;
 
-const auto ROBORIO_HASH = hashstr("roborio");
-const auto PWM1_HASH = hashstr("pulse_width_1");
-const auto SPARK_HASH = hashstr("spark1");
-const auto CURRENT_HASH = hashstr("current");
+const auto ROBORIO_HASH = hasher("roborio");
+const auto PWM1_HASH = hasher("pulse_width_1");
+const auto SPARK_HASH = hasher("spark1");
+const auto CURRENT_HASH = hasher("current");
 
 void setup_sample_wiremap(){
 	WireMap::reset();
@@ -22,9 +22,9 @@ void setup_sample_wiremap(){
 	);
 }
 
-static void BM_HashStr(benchmark::State& state){
+static void BM_Hasher(benchmark::State& state){
 	for(auto _ : state){
-		hashstr("roborio");
+		hasher("roborio");
     }
 }
 
@@ -105,7 +105,7 @@ static void BM_ParameterAccess(benchmark::State& state){
     }
 }
 
-BENCHMARK(BM_HashStr);
+BENCHMARK(BM_Hasher);
 
 BENCHMARK(BM_ParameterConstructor);
 BENCHMARK(BM_ResultConstructor);

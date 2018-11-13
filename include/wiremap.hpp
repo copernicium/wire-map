@@ -22,7 +22,7 @@ namespace wiremap{
 
 		template<typename... Members>
 		static void add(const std::string& KEY, const Members&... DEVICE_MEMBERS)noexcept{
-			add(hashstr(KEY), DEVICE_MEMBERS...);
+			add(hasher(KEY), DEVICE_MEMBERS...);
 		}
 
         static Device& get(const detail::KeyType&)noexcept;

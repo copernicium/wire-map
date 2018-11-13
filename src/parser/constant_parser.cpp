@@ -16,18 +16,14 @@ namespace wiremap::parser{
 		return value;
 	}
 
-	ConstantNode ConstantNode::parse(const std::vector<std::string>& split_line){
+	ConstantNode ConstantNode::parse(const Line& split_line){
         assert(split_line.size() >= 3);
 
         ConstantNode constant_node;
         constant_node.name = split_line[split_line.size() - 1];
-        constant_node.type = TypeNode::parse(subvector(split_line, 1, split_line.size() - 1));
+        constant_node.type = TypeNode::parse(split_line.segment(1, split_line.size() - 1));
 
         return constant_node;
-    }
-
-    ConstantNode ConstantNode::parse(const std::string& LINE){
-        return parse(splitLine(LINE));
     }
 
     std::string ConstantNode::toString()const{
@@ -39,7 +35,7 @@ namespace wiremap::parser{
         return a;
     }
 
-	bool ConstantNode::identify(const std::vector<std::string>& LINE){
+	bool ConstantNode::identify(const Line& LINE){
 		return LINE.size() >= 3 && LINE.front() == ConstantNode::KEYWORD;
 	}
 

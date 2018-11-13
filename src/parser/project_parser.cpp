@@ -5,21 +5,33 @@
 #include "util.hpp"
 #include <fstream>
 
+// #include <iostream>
+
 namespace wiremap::parser{
-    std::vector<std::string> readFile(const std::filesystem::path& FILE){ //consider splitting every line here
+	Lines readFile(const std::filesystem::path& FILE){ //consider splitting every line here
         std::ifstream file_stream(FILE, std::ifstream::in);
         if(!file_stream.is_open() || file_stream.peek() == std::ifstream::traits_type::eof()){
             return {};
         }
         std::string line;
-        std::vector<std::string> lines;
+		Lines tokenized;
 
-		while(std::getline(file_stream, line)){
+		while(std::getline(file_stream, line)){ // Read file as strings so everything is null terminated
             if(!line.empty()){
-                lines.push_back(line);
+				tokenized.push_back(Line::tokenize(line));
             }
         }
-        return lines;
+
+		// for(const auto& a: tokenized){
+		// 	std::cout << "indentation: " << a.getIndentation() << " ";
+		// 	for(const auto& b: a){
+		// 		std::cout << "\"" << b << "\" ";
+		// 	}
+		// 	std::cout<<"\n";
+		// }
+		// std::cout<<"=========================== End parsed/tokenized\n";
+
+        return tokenized;
     }
 
     void Project::parseFile(const std::filesystem::path& FILE){
@@ -27,22 +39,22 @@ namespace wiremap::parser{
             return;
         }
 
-        const std::vector<std::string> LINES = readFile(FILE);
+        const Lines LINES = readFile(FILE);
 
 		if(FILE.stem() == PROJECT_MAIN_FILE_NAME){
             WireMapParser::parse(LINES);
         } else {
 			for(unsigned i = 0; i < LINES.size(); i++){
-				if(indentCount(LINES[i]) == 0){
-					std::vector<std::string> line = splitLine(LINES[i]);
+				if(LINES[i].getIndentation() == 0){
+					const Line& LINE = LINES[i];
 
-					if(DeviceNode::identify(line)){
-						std::vector<std::string> scope = captureScope(LINES, i);
+					if(DeviceNode::identify(LINE)){
+						Lines scope = captureScope(LINES, i);
 						i += scope.size() - 1; //skip scope in next search
 
 						DeviceNodes::parse(scope);
-					} else if(TypeMap::identify(line)){
-						TypeMap::parse(line);
+					} else if(TypeMap::identify(LINE)){
+						TypeMap::parse(LINE);
 					}
 				}
 			}

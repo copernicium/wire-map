@@ -14,7 +14,7 @@ namespace wiremap{
 	}
 
 	Device& WireMap::get(const std::string& KEY)noexcept{
-		return get(hashstr(KEY));
+		return get(hasher(KEY));
 	}
 
 	bool WireMap::exists(const detail::KeyType& KEY)noexcept{
@@ -25,7 +25,7 @@ namespace wiremap{
 	}
 
 	bool WireMap::exists(const std::string& KEY)noexcept{
-		return exists(hashstr(KEY));
+		return exists(hasher(KEY));
 	}
 
 	std::shared_ptr<google::dense_hash_map<detail::KeyType,Function,detail::Hasher,detail::KeyCompare>> Functions::functions = nullptr;

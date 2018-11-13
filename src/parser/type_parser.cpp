@@ -1,11 +1,11 @@
 #include "parser/type_parser.hpp"
 
-#include <string_view>
-
 #include "parser/util.hpp"
 #include "util.hpp"
 
 namespace wiremap::parser{
+    std::shared_ptr<google::dense_hash_map<wiremap::detail::KeyType,TypeNode,wiremap::detail::Hasher,wiremap::detail::KeyCompare>> TypeMap::types = nullptr;
+
     std::string asString(const TypeNode::BaseType& IN){
         switch(IN){
         case TypeNode::BaseType::LIST:
@@ -64,7 +64,7 @@ namespace wiremap::parser{
         } else if(IN == "Real"){
             return TypeNode::PrimitiveType::REAL;
         }
-        printf("IN:%s\n",IN.c_str());
+        printf("IN:%s\n",IN.data());
         NYI
     }
 
@@ -72,18 +72,18 @@ namespace wiremap::parser{
         return TypeNode(parsePrimitiveType(PRIMITIVE_TYPE));
     }
 
-    TypeNode TypeNode::parseList(const std::vector<std::string>& IN){
+    TypeNode TypeNode::parseList(const Line& IN){
         assert(isList(IN));
 
         return TypeNode(UnderlyingListType{
             std::make_shared<TypeNode>(
-                TypeNode::parse(subvector(IN, LIST_SIZE_POS + 1, IN.size()))
+                TypeNode::parse(IN.segment(LIST_SIZE_POS + 1, IN.size()))
             ),
-            std::stoi(IN[LIST_SIZE_POS])
+            std::stoi(static_cast<std::string>(IN[LIST_SIZE_POS]))
 		});
     }
 
-    TypeNode TypeNode::parseCollection(const std::vector<std::string>& IN){
+    TypeNode TypeNode::parseCollection(const Line& IN){
         assert(isCollection(IN));
 
         TypeNode type;
@@ -91,10 +91,10 @@ namespace wiremap::parser{
         type.underlying_type = UnderlyingCollectionType();
         unsigned start = CONTAINER_SPECIFIER_POS + 1;
         for(unsigned i = start; i < IN.size(); i++){
-            if(IN[i] == COLLECTION_SEPARATOR){
+            if(IN[i] == SYMBOLS[COMMA]){
                 std::get<UnderlyingCollectionType>(type.underlying_type).push_back(
                     std::make_shared<TypeNode>(
-                        TypeNode::parse(subvector(IN, start, i))
+                        TypeNode::parse(IN.segment(start, i))
                     )
                 );
                 start = i + 1;
@@ -102,7 +102,7 @@ namespace wiremap::parser{
         }
         std::get<UnderlyingCollectionType>(type.underlying_type).push_back( //capture last type in collection
             std::make_shared<TypeNode>(
-                TypeNode::parse(subvector(IN, start, IN.size()))
+                TypeNode::parse(IN.segment(start, IN.size()))
             )
         );
         return type;
@@ -138,15 +138,15 @@ namespace wiremap::parser{
         return v;
     }
 
-    bool TypeNode::isList(const std::vector<std::string>& IN){
+    bool TypeNode::isList(const Line& IN){
         return IN.size() > LIST_SIZE_POS && IN[CONTAINER_KEYWORD_POS] == LIST_KEYWORD && IN[CONTAINER_SPECIFIER_POS] == CONTAINER_TYPE_SPECIFIER && isNumber(IN[LIST_SIZE_POS]);
     }
 
-    bool TypeNode::isCollection(const std::vector<std::string>& IN){
+    bool TypeNode::isCollection(const Line& IN){
         return IN.size() > CONTAINER_SPECIFIER_POS && IN[CONTAINER_KEYWORD_POS] == COLLECTION_KEYWORD && IN[CONTAINER_SPECIFIER_POS] == CONTAINER_TYPE_SPECIFIER;
     }
 
-    TypeNode TypeNode::parse(const std::vector<std::string>& IN){
+    TypeNode TypeNode::parse(const Line& IN){
         assert(!IN.empty());
 
         if(isCollection(IN)){
@@ -158,10 +158,6 @@ namespace wiremap::parser{
 			return TypeMap::get(IN.front());
 		}
 		return TypeNode::parseObject(IN.front());
-    }
-
-    TypeNode TypeNode::parse(const std::string& in){
-        return parse(splitLine(in));
     }
 
     std::string TypeNode::toString()const{

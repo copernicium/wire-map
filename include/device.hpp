@@ -21,23 +21,20 @@ namespace wiremap{
     public:
         const std::shared_ptr<Parameter>& getParameter(const detail::KeyType&)const noexcept;
 
-		template<typename RawKeyType, typename = std::enable_if_t<std::is_convertible_v<RawKeyType, std::string>>>
-		const std::shared_ptr<Parameter>& getParameter(const RawKeyType& KEY)const noexcept{
-			return getParameter(hashstr(KEY));
+		const std::shared_ptr<Parameter>& getParameter(const std::string& KEY)const noexcept{
+			return getParameter(hasher(KEY));
 		}
 
         const std::shared_ptr<const Object>& getConstant(const detail::KeyType&)const noexcept;
 
-		template<typename RawKeyType, typename = std::enable_if_t<std::is_convertible_v<RawKeyType, std::string>>>
-        const std::shared_ptr<const Object>& getConstant(const RawKeyType& KEY)const noexcept{
-			return getConstant(hashstr(KEY));
+        const std::shared_ptr<const Object>& getConstant(const std::string& KEY)const noexcept{
+			return getConstant(hasher(KEY));
 		}
 
         const std::shared_ptr<Result>& getResult(const detail::KeyType&)const noexcept;
 
-		template<typename RawKeyType, typename = std::enable_if_t<std::is_convertible_v<RawKeyType, std::string>>>
-        const std::shared_ptr<Result>& getResult(const RawKeyType& KEY)const noexcept{
-			return getResult(hashstr(KEY));
+        const std::shared_ptr<Result>& getResult(const std::string& KEY)const noexcept{
+			return getResult(hasher(KEY));
 		}
 
 		bool exists(const detail::KeyType&)const;
@@ -76,10 +73,10 @@ namespace wiremap{
 			}
         }
 
-		template<typename RawKeyType, typename = std::enable_if_t<std::is_convertible_v<RawKeyType, std::string>>, typename First, typename... Members>
-        Device(const detail::KeyType& DEVICE_KEY, const std::pair<RawKeyType, First>& first_member, const Members&... members)noexcept: Device(DEVICE_KEY, std::make_pair(hashstr(first_member.first), first_member.second), members...){}
+		template<typename First, typename... Members>
+        Device(const detail::KeyType& DEVICE_KEY, const std::pair<std::string, First>& first_member, const Members&... members)noexcept: Device(DEVICE_KEY, std::make_pair(hasher(first_member.first), first_member.second), members...){}
 
         template<typename... Members>
-        Device(const std::string& DEVICE_KEY, const Members&... members)noexcept: Device(hashstr(DEVICE_KEY), members...){}
+        Device(const std::string& DEVICE_KEY, const Members&... members)noexcept: Device(hasher(DEVICE_KEY), members...){}
     };
 }

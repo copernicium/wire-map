@@ -43,21 +43,20 @@ namespace wiremap::parser{
         static constexpr unsigned CONTAINER_SPECIFIER_POS = 1;
         static constexpr unsigned LIST_SIZE_POS = 2;
         static constexpr std::string_view COLLECTION_KEYWORD = "Collection";
-        static constexpr std::string_view COLLECTION_SEPARATOR = ",";
         static constexpr std::string_view LIST_KEYWORD = "List";
         static constexpr std::string_view CONTAINER_TYPE_SPECIFIER = "of";
 
-        static bool isList(const std::vector<std::string>&);
+        static bool isList(const Line&);
 
-        static bool isCollection(const std::vector<std::string>&);
+        static bool isCollection(const Line&);
 
         BaseType base_type;
 
         UnderlyingType underlying_type;
 
-        static TypeNode parseObject(const std::string&);
-        static TypeNode parseList(const std::vector<std::string>&);
-        static TypeNode parseCollection(const std::vector<std::string>&);
+        static TypeNode parseObject(const std::string&); // TODO rename to parsePrimitive
+        static TypeNode parseList(const Line&);
+        static TypeNode parseCollection(const Line&);
     public:
 
         BaseType getBaseType()const;
@@ -70,8 +69,7 @@ namespace wiremap::parser{
 
         std::vector<TypeNode> getCollectionTypes()const;
 
-        static TypeNode parse(const std::vector<std::string>&);
-        static TypeNode parse(const std::string&);
+        static TypeNode parse(const Line&);
 
         TypeNode();
         TypeNode(const PrimitiveType&);
@@ -81,6 +79,8 @@ namespace wiremap::parser{
         std::string toString()const;
 
         friend bool operator==(const TypeNode&, const TypeNode&);
+
+		friend struct TypeMap;
     };
 
     bool operator==(const TypeNode&, const TypeNode&);
@@ -97,14 +97,14 @@ namespace wiremap::parser{
         static std::shared_ptr<google::dense_hash_map<wiremap::detail::KeyType,TypeNode,wiremap::detail::Hasher,wiremap::detail::KeyCompare>> types;
 
     public:
-        static bool identify(const std::vector<std::string>& LINE){
+        static bool identify(const Line& LINE){
             return LINE.size() >= MINIMUM_LINE_SIZE && LINE[KEYWORD_POS] == KEYWORD;
         }
 
         static void reset(){
             types = std::make_shared<google::dense_hash_map<wiremap::detail::KeyType,TypeNode,wiremap::detail::Hasher,wiremap::detail::KeyCompare>>();
             types->set_empty_key(0);
-            const std::array<std::string, 9> PRIMITIVES = {
+            const std::array<std::string_view, 9> PRIMITIVES = {
                 "Bit",
                 "Char",
                 "Byte",
@@ -116,7 +116,7 @@ namespace wiremap::parser{
                 "Real"
             };
             for(const auto& a: PRIMITIVES){
-                add(a,TypeNode::parse(a));
+                add(std::string(a),TypeNode::parseObject(std::string(a)));
             }
         }
 
@@ -129,7 +129,7 @@ namespace wiremap::parser{
         }
 
         static void add(const std::string& KEY, const TypeNode& VALUE)noexcept{
-            add(hashstr(KEY),VALUE);
+            add(hasher(KEY),VALUE);
         }
 
         static TypeNode& get(const wiremap::detail::KeyType& KEY)noexcept{
@@ -138,7 +138,7 @@ namespace wiremap::parser{
         }
 
         static TypeNode& get(const std::string& KEY)noexcept{
-            return get(hashstr(KEY));
+            return get(hasher(KEY));
         }
 
         static bool exists(const wiremap::detail::KeyType& KEY)noexcept{
@@ -149,17 +149,17 @@ namespace wiremap::parser{
         }
 
         static bool exists(const std::string& KEY)noexcept{
-            return exists(hashstr(KEY));
+            return exists(hasher(KEY));
         }
 
-        static void parse(const std::vector<std::string>& LINE){
+        static void parse(const Line& LINE){
             if(LINE.empty() || !identify(LINE)){
                 return;
             }
             if(exists(LINE.front())){
                 exit(EXIT_FAILURE); //TODO error, redefinition
             }
-            add(LINE.front(), TypeNode::parse(std::vector<std::string>{LINE.begin() + KEYWORD_POS + 1, LINE.end()}));
+            add(LINE.front(), TypeNode::parse(LINE.segment(KEYWORD_POS + 1, LINE.size())));
         }
 
         TypeMap() = delete;

@@ -50,8 +50,8 @@ INCLUDE_DIRECTORIES("${CMAKE_BINARY_DIR}/include")
 # Parser Library
 
 ADD_LIBRARY(parser SHARED
-  src/parser/init.cpp
   src/parser/util.cpp
+  src/parser/tokenizer.cpp
   src/parser/type_parser.cpp
   src/parser/object_parser.cpp
   src/parser/parameter_parser.cpp
@@ -69,6 +69,7 @@ TARGET_LINK_LIBRARIES(parser stdc++fs)
 
 ADD_LIBRARY(wiremap SHARED
   src/object.cpp
+  src/map_util.cpp
   src/result.cpp
   src/parameter.cpp
   src/device.cpp

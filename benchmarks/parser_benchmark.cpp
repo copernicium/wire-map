@@ -7,7 +7,7 @@ using namespace wiremap::parser;
 static void BM_SplitLine(benchmark::State& state) {
 	const std::string LINE_EXAMPLE = "  Parameter   List of 10 Collection of Real, Bool Real Input  ";
     for(auto _ : state){
-		splitLine(LINE_EXAMPLE);
+		Line::tokenize(LINE_EXAMPLE);
 	}
 }
 

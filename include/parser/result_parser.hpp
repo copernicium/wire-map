@@ -20,11 +20,9 @@ namespace wiremap::parser{
 
 		TypeNode getType()const;
 
-		static bool identify(const std::vector<std::string>&);
+		static bool identify(const Line&);
 
-        static ResultNode parse(const std::vector<std::string>&);
-
-		static ResultNode parse(const std::string&);
+        static ResultNode parse(const Line&);
 
         ResultNode();
 

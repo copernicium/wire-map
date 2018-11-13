@@ -20,11 +20,9 @@ namespace wiremap::parser{
 
 		std::optional<std::string> getValue()const;
 
-		static bool identify(const std::vector<std::string>&);
+		static bool identify(const Line&);
 
-        static ConstantNode parse(const std::vector<std::string>&);
-
-        static ConstantNode parse(const std::string&);
+        static ConstantNode parse(const Line&);
 
         ConstantNode();
 

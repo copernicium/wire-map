@@ -27,11 +27,9 @@ namespace wiremap::parser{
 
 		std::optional<std::string> getSourceResult()const;
 
-		static bool identify(const std::vector<std::string>&);
+		static bool identify(const Line&);
 
-        static ParameterNode parse(const std::vector<std::string>&);
-
-        static ParameterNode parse(const std::string&);
+        static ParameterNode parse(const Line&);
 
         std::string toString()const;
 

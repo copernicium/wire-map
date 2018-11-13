@@ -3,9 +3,9 @@
 #include "parser/util.hpp"
 #include "util.hpp"
 
-#include <string_view>
-
 namespace wiremap::parser{
+    std::shared_ptr<google::dense_hash_map<wiremap::detail::KeyType,DeviceNode,wiremap::detail::Hasher,wiremap::detail::KeyCompare>> DeviceNodes::device_nodes = nullptr;
+
 	std::string DeviceNode::getName()const{
 		return name;
 	}
@@ -49,18 +49,18 @@ namespace wiremap::parser{
 		return false;
 	}
 
-    bool DeviceNode::identify(const std::vector<std::string>& LINE){
+    bool DeviceNode::identify(const Line& LINE){
         return LINE.size() == REQUIRED_LINE_SIZE && LINE[KEYWORD_POS] == KEYWORD;
     }
 
-    DeviceNode DeviceNode::parse(const std::vector<std::string>& SCOPE){
-        assert(!SCOPE.empty() && identify(splitLine(SCOPE.front())));
+    DeviceNode DeviceNode::parse(const Lines& SCOPE){
+        assert(!SCOPE.empty() && identify(SCOPE.front()));
 
         DeviceNode device_node;
-        device_node.name = splitLine(SCOPE.front())[1];
+        device_node.name = SCOPE.front()[1];
 
         for(unsigned i = 1; i < SCOPE.size(); i++){ // skip first line (name)
-            unsigned indent_count = indentCount(SCOPE[i]);
+            unsigned indent_count = SCOPE[i].getIndentation();
             if(indent_count != 1 && !SCOPE[i].empty()){
                 if(indent_count == 0){ //end of device definition
                     break;
@@ -68,7 +68,7 @@ namespace wiremap::parser{
                 continue;
             }
 
-            std::vector<std::string> line = splitLine(SCOPE[i]);
+            const Line& line = SCOPE[i];
 
 			if(!line.empty()){ //TODO all names must be unique within device
                 if(ParameterNode::identify(line)){
@@ -78,7 +78,7 @@ namespace wiremap::parser{
                 } else if(ResultNode::identify(line)){
                     device_node.results.push_back(ResultNode::parse(line));//TODO not split line but scope
                 } else {
-                    NYI
+					NYI
                 }
             }
         }

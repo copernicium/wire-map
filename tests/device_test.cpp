@@ -7,16 +7,21 @@
 
 using namespace wiremap;
 
+const std::string SPARK1_STR = "spark1";
+const std::string CIM1_STR = "cim1";
+const std::string CURRENT_STR = "current";
+const std::string COEFFICIENT_STR = "coefficient";
+
 TEST(DeviceTest, AddConstantTest){
 	WireMap::reset();
 	const Object CONSTANT = Object::primitive(Type::REAL, 5);
 
     WireMap::add(
-        "spark1",
-        std::make_pair("coefficient",CONSTANT)
+        SPARK1_STR,
+        std::make_pair(COEFFICIENT_STR,CONSTANT)
 	);
 
-    EXPECT_EQ(Object::visit(compare_equal, *WireMap::get("spark1").getConstant("coefficient"), CONSTANT), true);
+    EXPECT_EQ(Object::visit(compare_equal, *WireMap::get(SPARK1_STR).getConstant(COEFFICIENT_STR), CONSTANT), true);
 }
 
 TEST(DeviceTest, ParameterTest){
@@ -24,11 +29,11 @@ TEST(DeviceTest, ParameterTest){
     Result r = std::function<Object(void)>([]{ return Object::primitive((Integer)5); });
 
     WireMap::add(
-        "spark1",
-        std::make_pair("current",r)
+        SPARK1_STR,
+        std::make_pair(CURRENT_STR,r)
 	);
 
-    Parameter p = {"spark1", "current"};
+    Parameter p = {SPARK1_STR, CURRENT_STR};
     Object r2 = p.get();
 
     EXPECT_EQ(Object::visit(compare_equal, r2, r.get()), true);
@@ -40,18 +45,18 @@ TEST(DeviceTest, ComplexParameterTest){
     Result r = std::function<Object(void)>([]{ return Object::primitive((Integer)5); });
 
     WireMap::add(
-        "spark1",
-        std::make_pair("current",r)
+        SPARK1_STR,
+        std::make_pair(CURRENT_STR,r)
     );
 
-    Parameter p = {"spark1", "current"};
+    Parameter p = {SPARK1_STR, CURRENT_STR};
 
 	WireMap::add(
-		"cim1",
-		std::make_pair("current", p)
+		CIM1_STR,
+		std::make_pair(CURRENT_STR, p)
 	);
 
-    Object r2 = WireMap::get("cim1").getParameter("current")->get();
+    Object r2 = WireMap::get("cim1").getParameter(CURRENT_STR)->get();
 
     EXPECT_EQ(Object::visit(compare_equal, r2, r.get()), true);
 }

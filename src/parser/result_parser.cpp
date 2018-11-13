@@ -12,22 +12,18 @@ namespace wiremap::parser{
 		return type;
 	}
 
-	bool ResultNode::identify(const std::vector<std::string>& LINE){
+	bool ResultNode::identify(const Line& LINE){
 		return LINE.size() >= MIN_DECLARATION_TERMS && LINE.front() == KEYWORD;
 	}
 
-    ResultNode ResultNode::parse(const std::vector<std::string>& LINE){
+    ResultNode ResultNode::parse(const Line& LINE){
         assert(LINE.size() >= MIN_DECLARATION_TERMS);
 
         ResultNode result_node;
         result_node.name = LINE[LINE.size() - 1];
-        result_node.type = TypeNode::parse(subvector(LINE, 1, LINE.size() - 1));
+        result_node.type = TypeNode::parse(LINE.segment(1, LINE.size() - 1));
         //TODO generating function
         return result_node;
-    }
-
-    ResultNode ResultNode::parse(const std::string& LINE){
-        return parse(splitLine(LINE));
     }
 
     std::string ResultNode::toString()const{

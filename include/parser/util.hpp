@@ -1,20 +1,11 @@
 #pragma once //TODO determine if there is confusion between util.hpp and parser/util.hpp
 
+#include "map_util.hpp"
+#include "parser/tokenizer.hpp"
+
 #include <functional>
-#include <string>
-#include <string_view>
-#include <vector>
 
 namespace wiremap::parser{
-    namespace detail{
-        constexpr std::string_view INDENT = "    ";
-        constexpr char COMMENT_START = '#';
-    }
-
-    std::vector<std::string> splitLine(const std::string&);
-
-    unsigned indentCount(const std::string&);
-
     bool isNumber(const std::string&);
 
     template<typename T>
@@ -30,10 +21,10 @@ namespace wiremap::parser{
         return a;
     }
 
-    std::vector<std::string> captureScope(const std::vector<std::string>&, unsigned scope_start = 0);
+    Lines captureScope(const Lines&, unsigned scope_start = 0);
 
     template<typename T>
-    std::vector<T> subvector(const std::vector<T>& SOURCE, const unsigned& START, const unsigned& END){
+    std::vector<T> subvector(const std::vector<T>& SOURCE, const std::size_t& START, const std::size_t& END){
         return std::vector<T>{SOURCE.begin() + START, SOURCE.begin() + END};
     }
 }

@@ -5,7 +5,7 @@
 #include <sparsehash/dense_hash_map>
 
 namespace wiremap{
-    const std::hash<std::string> hashstr;
+	std::size_t hasher(const std::string&);
 
     namespace detail{
         using KeyType = std::size_t;

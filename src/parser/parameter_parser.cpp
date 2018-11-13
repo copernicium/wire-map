@@ -20,30 +20,26 @@ namespace wiremap::parser{
 		return source_result;
 	}
 
-	bool ParameterNode::identify(const std::vector<std::string>& LINE){
+	bool ParameterNode::identify(const Line& LINE){
 		return LINE.size() >= MIN_DECLARATION_TERMS && LINE.front() == KEYWORD;
 	}
 
-	ParameterNode ParameterNode::parse(const std::vector<std::string>& LINE){
+	ParameterNode ParameterNode::parse(const Line& LINE){
         assert(identify(LINE));
 
         ParameterNode parameter_node;
         parameter_node.name = LINE[LINE.size() - 1];
-        parameter_node.type = TypeNode::parse(subvector(LINE, 1, LINE.size() - 1));
+        parameter_node.type = TypeNode::parse(LINE.segment(1, LINE.size() - 1));
 
         return parameter_node;
     }
 
-    ParameterNode ParameterNode::parse(const std::string& LINE){
-        return parse(splitLine(LINE));
-    }
-
-    std::string ParameterNode::toString()const{
-        std::string a = "{";
+	std::string ParameterNode::toString()const{
+		std::string a = "{";
         a += "\"name\":\"" + name + "\", ";
         a += "\"type\":" + type.toString() + ", ";
-        a += "\"source_device\":" + (source_device ? source_device.value() : "null") + ", ";
-        a += "\"source_result\":" + (source_result ? source_result.value() : "null");
+        a += "\"source_device\":" + (source_device ? "\"" + source_device.value() + "\"" : "null") + ", ";
+        a += "\"source_result\":" + (source_result ? "\"" + source_result.value() + "\"" : "null");
         a += "}";
         return a;
     }

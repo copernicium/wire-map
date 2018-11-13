@@ -4,6 +4,7 @@
 #include "parser/parameter_parser.hpp"
 #include "parser/constant_parser.hpp"
 #include "parser/result_parser.hpp"
+#include "parser/tokenizer.hpp"
 #include "util.hpp"
 
 namespace wiremap::parser{
@@ -30,8 +31,8 @@ namespace wiremap::parser{
 		bool isConstant(const std::string&)const;
 		bool isResult(const std::string&)const;
 
-        static bool identify(const std::vector<std::string>&);
-        static DeviceNode parse(const std::vector<std::string>&);
+        static bool identify(const Line&);
+        static DeviceNode parse(const Lines&);
 
         std::string toString()const;
 
@@ -61,7 +62,7 @@ namespace wiremap::parser{
         }
 
         static void add(const std::string& KEY, const DeviceNode& VALUE)noexcept{
-            add(hashstr(KEY),VALUE);
+            add(hasher(KEY),VALUE);
         }
 
         static DeviceNode& get(const wiremap::detail::KeyType& KEY)noexcept{
@@ -70,7 +71,7 @@ namespace wiremap::parser{
         }
 
         static DeviceNode& get(const std::string& KEY)noexcept{
-            return get(hashstr(KEY));
+            return get(hasher(KEY));
         }
 
         static bool exists(const wiremap::detail::KeyType& KEY)noexcept{
@@ -81,7 +82,7 @@ namespace wiremap::parser{
         }
 
         static bool exists(const std::string& KEY)noexcept{
-            return exists(hashstr(KEY));
+            return exists(hasher(KEY));
         }
 
         static std::string toString(){
@@ -99,8 +100,8 @@ namespace wiremap::parser{
             return s;
         }
 
-        static void parse(const std::vector<std::string>& LINES){
-            if(LINES.empty() || !DeviceNode::identify(splitLine(LINES[0]))){
+        static void parse(const Lines& LINES){
+            if(LINES.empty() || !DeviceNode::identify(LINES[0])){
                 return;
             }
             DeviceNode a = DeviceNode::parse(LINES);
