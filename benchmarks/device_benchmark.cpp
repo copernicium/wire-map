@@ -42,8 +42,9 @@ static void BM_ConstantConstructor(benchmark::State& state){
 }
 
 static void BM_ResultConstructor(benchmark::State& state){
+	const auto F = std::function<Object(void)>([]{ return Object::primitive((Integer)5); });
     for(auto _ : state){
-		Result r = std::function<Object(void)>([]{ return Object::primitive((Integer)5); });
+		Result r = F;
     }
 }
 
@@ -100,11 +101,13 @@ static void BM_DeviceSetup(benchmark::State& state){
 static void BM_ParameterAccess(benchmark::State& state){
 	setup_sample_wiremap();
 
-    for(auto _ : state){
-        Parameter p ={ROBORIO_HASH, PWM1_HASH};
-        Object r2 = p.get();
+    Parameter p = {ROBORIO_HASH, PWM1_HASH};
+	std::optional<Object> r2;
 
-		// std::cout << "value: "<<Object::visit(to_string, r2) << "\n";
+    for(auto _ : state){
+        r2 = p.get();
+
+		// std::cout << "value: "<<Object::visit(to_string, r2.value()) << "\n";
     }
 }
 

@@ -11,7 +11,7 @@ namespace wiremap{
     struct Result: public detail::DeviceMemberBase{
     private:
         detail::KeyType source_device_key;
-        google::dense_hash_map<detail::KeyType,detail::KeyType,detail::Hasher,detail::KeyCompare> source_parameter_hashes; //TODO Peripherals need Results too
+        google::dense_hash_map<detail::KeyType,detail::KeyType,detail::Hasher,detail::KeyCompare> source_parameter_hashes; //TODO Peripherals need Results too; look for source constants too
 		std::optional<Object> cache;
         std::function<Object(void)> update_function; //TODO use wire map function instead
 
