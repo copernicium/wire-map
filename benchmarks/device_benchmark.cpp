@@ -35,12 +35,6 @@ static void BM_ParameterConstructor(benchmark::State& state){
     }
 }
 
-static void BM_ConstantConstructor(benchmark::State& state){
-    for(auto _ : state){
-        Constant<Integer> c = 8;
-    }
-}
-
 static void BM_ResultConstructor(benchmark::State& state){
 	const auto F = std::function<Object(void)>([]{ return Object::primitive((Integer)5); });
     for(auto _ : state){
@@ -114,7 +108,6 @@ static void BM_ParameterAccess(benchmark::State& state){
 BENCHMARK(BM_HashStr);
 
 BENCHMARK(BM_ParameterConstructor);
-BENCHMARK(BM_ConstantConstructor);
 BENCHMARK(BM_ResultConstructor);
 
 BENCHMARK(BM_DeviceConstructor0);

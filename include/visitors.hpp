@@ -38,6 +38,11 @@ namespace wiremap{
 		bool operator()(const T& a, const T& b)const{
 			return a == b;
 		}
+
+		template<typename T, typename R, typename = std::enable_if_t<detail::is_wiremap_primitive_v<T>>>
+		bool operator()(const T& a, const R& b)const{
+			return a.get() == b;
+		}
 	};
 
 	const CompareEqual compare_equal;

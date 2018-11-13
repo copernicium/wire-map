@@ -7,7 +7,20 @@
 
 using namespace wiremap;
 
+TEST(DeviceTest, AddConstantTest){
+	WireMap::reset();
+	const Object CONSTANT = Object::primitive(Type::REAL, 5);
+
+    WireMap::add(
+        "spark1",
+        std::make_pair("coefficient",CONSTANT)
+	);
+
+    EXPECT_EQ(Object::visit(compare_equal, *WireMap::get("spark1").getConstant("coefficient"), CONSTANT), true);
+}
+
 TEST(DeviceTest, ParameterTest){
+	WireMap::reset();
     Result r = std::function<Object(void)>([]{ return Object::primitive((Integer)5); });
 
     WireMap::add(

@@ -1,8 +1,7 @@
 #pragma once
 
-#include <memory>
-#include "device_bases.hpp"
 #include "map_util.hpp"
+#include "object.hpp"
 
 namespace wiremap{
 	struct Parameter; // TODO necessary?
@@ -15,7 +14,7 @@ namespace wiremap{
 
         google::dense_hash_map<detail::KeyType,std::shared_ptr<Parameter>,detail::Hasher,detail::KeyCompare> parameters;
 
-        google::dense_hash_map<detail::KeyType,std::shared_ptr<const detail::ConstantBase>,detail::Hasher,detail::KeyCompare> constants;
+        google::dense_hash_map<detail::KeyType,std::shared_ptr<const Object>,detail::Hasher,detail::KeyCompare> constants;
 
         google::dense_hash_map<detail::KeyType,std::shared_ptr<Result>,detail::Hasher,detail::KeyCompare> results;
 
@@ -27,10 +26,10 @@ namespace wiremap{
 			return getParameter(hashstr(KEY));
 		}
 
-        const std::shared_ptr<const detail::ConstantBase>& getConstant(const detail::KeyType&)const noexcept;
+        const std::shared_ptr<const Object>& getConstant(const detail::KeyType&)const noexcept;
 
 		template<typename RawKeyType, typename = std::enable_if_t<std::is_convertible_v<RawKeyType, std::string>>>
-        const std::shared_ptr<const detail::ConstantBase>& getConstant(const RawKeyType& KEY)const noexcept{
+        const std::shared_ptr<const Object>& getConstant(const RawKeyType& KEY)const noexcept{
 			return getConstant(hashstr(KEY));
 		}
 
@@ -43,7 +42,7 @@ namespace wiremap{
 
 		bool exists(const detail::KeyType&)const;
 
-        template<typename Member, typename = std::enable_if_t<std::is_base_of_v<detail::DeviceMemberBase, Member>>>
+        template<typename Member, typename = std::enable_if_t<std::is_same_v<Object, Member> || std::is_same_v<Parameter, Member> || std::is_same_v<Result, Member>>>
         void add(const std::pair<detail::KeyType, Member>& MEMBER)noexcept{
 			assert(!exists(MEMBER.first));
 
@@ -52,7 +51,7 @@ namespace wiremap{
 				results[MEMBER.first]->setSourceDeviceKey(device_key);
             } else if constexpr(std::is_same_v<Parameter,Member>){
                 parameters[MEMBER.first] = std::make_shared<Member>(MEMBER.second);
-            } else if constexpr(std::is_base_of_v<detail::ConstantBase,Member>){
+            } else if constexpr(std::is_same_v<Object, Member>){
                 constants[MEMBER.first] = std::make_shared<Member>(MEMBER.second);
             }
         }
@@ -63,7 +62,7 @@ namespace wiremap{
 
         template<typename First, typename... Members>
         Device(const detail::KeyType& DEVICE_KEY, const std::pair<detail::KeyType, First>& first_member, const Members&... members)noexcept: Device(DEVICE_KEY, members...){
-            static_assert(std::is_base_of_v<detail::DeviceMemberBase,First>, "Constructing device from non-member type");
+			static_assert(std::is_same_v<Object, First> || std::is_same_v<Parameter, First> || std::is_same_v<Result, First>, "Constructing device from non-member type");
 
 			assert(!exists(first_member.first));
 
@@ -72,9 +71,9 @@ namespace wiremap{
 				results[first_member.first]->setSourceDeviceKey(DEVICE_KEY);
             } else if constexpr(std::is_same_v<Parameter,First>){
                 parameters[first_member.first] = std::make_shared<First>(first_member.second);
-            } else if constexpr(std::is_base_of_v<detail::ConstantBase,First>){
+            } else if constexpr(std::is_same_v<Object,First>){
                 constants[first_member.first] = std::make_shared<First>(first_member.second);
-            }
+			}
         }
 
 		template<typename RawKeyType, typename = std::enable_if_t<std::is_convertible_v<RawKeyType, std::string>>, typename First, typename... Members>

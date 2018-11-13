@@ -7,7 +7,7 @@ namespace wiremap{
 		return i->second;
 	}
 
-	const std::shared_ptr<const detail::ConstantBase>& Device::getConstant(const detail::KeyType& KEY)const noexcept{
+	const std::shared_ptr<const Object>& Device::getConstant(const detail::KeyType& KEY)const noexcept{
 		const auto& i = constants.find(KEY);
 		assert(i != constants.end());
 		return i->second;

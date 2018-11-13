@@ -1,7 +1,6 @@
 #pragma once
 
 #include "primitive.hpp"
-#include "constant.hpp"
 
 #include <memory>
 #include <tuple>
@@ -9,21 +8,6 @@
 #include <vector>
 
 namespace wiremap{
-	// Definition of primitive types
-    template<typename T>
-    using Integral = detail::Primitive<T, 0, attributes::Integral<T>>;
-
-    using Bit = Integral<bool>;
-    using Char = Integral<char>;
-    using Byte = Integral<uint8_t>;
-    using Word = Integral<uint16_t>;
-    using DWord = Integral<uint32_t>;
-    using QWord = Integral<uint64_t>;
-    using Integer = Integral<long>;
-
-    using Bool = detail::Primitive<bool, false>;
-    using Real = detail::Primitive<double, 0>;
-
 	// Feature to be added in C++20
 	template<typename T>
 	struct remove_cvref{

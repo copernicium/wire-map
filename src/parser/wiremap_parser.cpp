@@ -3,7 +3,6 @@
 #include "parser/util.hpp"
 #include "util.hpp"
 #include "object.hpp"
-#include "constant.hpp"
 #include "wiremap.hpp"
 
 #include <iostream> // TODO remove

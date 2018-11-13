@@ -17,7 +17,7 @@ namespace wiremap{
 		}
 	}
 
-	Object::Object(const Object& OTHER)noexcept: type(OTHER.type), value(OTHER.value){
+	Object::Object(const Object& OTHER)noexcept: type(OTHER.type), value(OTHER.value){ // Don't copy over container's vector just to rewrite it
 		if(type == Type::CONTAINER){
 			for(unsigned i = 0; i < size(); i++){
 				std::get<TypeInterface::element<Type::CONTAINER>>(value).at(i) = OTHER.at(i).clone();

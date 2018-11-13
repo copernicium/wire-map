@@ -1,13 +1,12 @@
 #pragma once
 
-#include "device_bases.hpp"
 #include "map_util.hpp"
 #include "result.hpp"
 #include "wiremap.hpp"
 
 // A Parameter is a constant pointer to the value of a Result in the WireMap
 namespace wiremap{
-    struct Parameter: public detail::DeviceMemberBase{
+    struct Parameter{
     private:
 		detail::KeyType source_device_key;
 		detail::KeyType source_result_key;

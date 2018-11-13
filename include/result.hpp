@@ -1,14 +1,13 @@
 #pragma once
 
 #include <functional> //TODO remove
-#include "device_bases.hpp"
 #include "function.hpp"
 #include "map_util.hpp"
 #include "object.hpp"
 
 // A Result is a function that generates its output using a set of Parameters within the same device as it
 namespace wiremap{
-    struct Result: public detail::DeviceMemberBase{
+    struct Result{
     private:
         detail::KeyType source_device_key;
         google::dense_hash_map<detail::KeyType,detail::KeyType,detail::Hasher,detail::KeyCompare> source_parameter_hashes; //TODO Peripherals need Results too; look for source constants too
