@@ -3,6 +3,7 @@
 #include "parser/util.hpp"
 #include "util.hpp"
 #include "object.hpp"
+#include "parameter.hpp"
 #include "wiremap.hpp"
 
 #include <iostream> // TODO remove
@@ -11,47 +12,55 @@ namespace wiremap::parser{
     void WireMapParser::parse(const Lines& LINES){
         for(unsigned i = 0; i < LINES.size(); i++){
             if(LINES[i].getIndentation() == 0){
-                const Line& first_line = LINES[i];
+                const Line& FIRST_LINE = LINES[i];
 
-                Lines scope = captureScope(LINES, i);
-                i += scope.size() - 1; //skip scope in next search
+                const Lines SCOPE = captureScope(LINES, i);
+                i += SCOPE.size() - 1; //skip scope in next search
 
-				std::string device_type_name = first_line[DEVICE_TYPE_POS];
+				const std::string& DEVICE_TYPE_NAME = FIRST_LINE[DEVICE_TYPE_POS];
 
-                if(!DeviceNodes::exists(device_type_name)){
+                if(!DeviceNodes::exists(DEVICE_TYPE_NAME)){
                     NYI //TODO error, device not found in project
                 }
 
-                printf("Found:%s\n", DeviceNodes::get(device_type_name).toString().c_str());
+				const DeviceNode& DEVICE_TYPE = DeviceNodes::get(DEVICE_TYPE_NAME);
 
-                WireMap::add(device_type_name);
-				for(unsigned scope_i = 1; scope_i < scope.size(); scope_i++){ // start after first line where device is declared
-					const Line& split_line = scope[scope_i];
-					// for(const auto& a: split_line){
+                printf("Found:%s\n", DEVICE_TYPE.toString().c_str());
+
+                WireMap::add(DEVICE_TYPE.getName());
+				Device device = WireMap::get(DEVICE_TYPE.getName());
+				for(unsigned scope_i = 1; scope_i < SCOPE.size(); scope_i++){ // start after first line where device is declared
+					const Line& LINE = SCOPE[scope_i];
+					// for(const auto& a: LINE){
 					// 	std::cout<<"\""<<a<<"\"";
 					// }
 					// std::cout<<"\n";
 
-					assert(DeviceNodes::exists(device_type_name));
-					int parameter_pos = DeviceNodes::get(device_type_name).getParameter(split_line[MEMBER_NAME_POS]);
+					const std::string& MEMBER_NAME = LINE[MEMBER_NAME_POS];
 
-
-					if(parameter_pos != -1){
-						assert(split_line[PARAMETER_SOURCE_SEPARATOR_POS] == SYMBOLS[DOT]);
-						DeviceNodes::get(device_type_name).parameters[parameter_pos].source_device = split_line[PARAMETER_SOURCE_DEVICE_POS];
-						DeviceNodes::get(device_type_name).parameters[parameter_pos].source_result = split_line[PARAMETER_SOURCE_RESULT_POS];
-					} else if(DeviceNodes::get(device_type_name).isConstant(split_line[MEMBER_NAME_POS])){
-
-					} else if(DeviceNodes::get(device_type_name).isResult(split_line[MEMBER_NAME_POS])){
+					if(DEVICE_TYPE.isParameter(MEMBER_NAME)){
+						assert(LINE[MEMBER_ASSIGNMENT_OPERATOR_POS] == SYMBOLS[PARAMETER_SOURCE]);
+						assert(LINE[PARAMETER_SOURCE_SEPARATOR_POS] == SYMBOLS[DOT]);
+						device.add(std::make_pair(
+									   hasher(MEMBER_NAME),
+									   Parameter(LINE[PARAMETER_SOURCE_DEVICE_POS], LINE[PARAMETER_SOURCE_RESULT_POS])
+							));
+					} else if(DEVICE_TYPE.isConstant(MEMBER_NAME)){
+						assert(LINE[MEMBER_ASSIGNMENT_OPERATOR_POS] == SYMBOLS[ASSIGN]);
+						// device.add(std::make_pair(
+						// 			   hasher(MEMBER_NAME),
+						// 			   Object() // TODO
+						// 			   ));
+					} else if(DEVICE_TYPE.isResult(MEMBER_NAME)){
 
 					} else {
 						NYI
 					}
 				}
 
-				for(const ParameterNode& PARAM: DeviceNodes::get(device_type_name).getParameters()){
+				for(const ParameterNode& PARAM: DeviceNodes::get(DEVICE_TYPE_NAME).getParameters()){
 					(void)PARAM;
-					// WireMap::get(device_type_name).add();
+					// WireMap::get(DEVICE_TYPE_NAME).add();
 				}
             }
         }

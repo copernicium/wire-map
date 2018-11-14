@@ -39,7 +39,7 @@ namespace wiremap{
 
 		bool exists(const detail::KeyType&)const;
 
-        template<typename Member, typename = std::enable_if_t<std::is_same_v<Object, Member> || std::is_same_v<Parameter, Member> || std::is_same_v<Result, Member>>>
+        template<typename Member, typename = std::enable_if_t<std::is_same_v<Object, Member> || std::is_same_v<Parameter, Member> || std::is_same_v<Result, Member>>> // TODO three different functions
         void add(const std::pair<detail::KeyType, Member>& MEMBER)noexcept{
 			assert(!exists(MEMBER.first));
 

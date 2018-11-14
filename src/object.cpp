@@ -77,12 +77,83 @@ namespace wiremap{
 		return *(std::get<TypeInterface::element<Type::CONTAINER>>(value)).at(I);
 	}
 
+	Object& Object::operator[](const std::size_t& I){
+		return at(I);
+	}
+
+	const Object& Object::operator[](const std::size_t& I)const{
+		return at(I);
+	}
+
+	bool Object::empty()const{
+		assert(type == Type::CONTAINER);
+		return std::get<TypeInterface::element<Type::CONTAINER>>(value).empty();
+	}
+
+	Object& Object::front(){
+		assert(type == Type::CONTAINER);
+		return *(std::get<TypeInterface::element<Type::CONTAINER>>(value).front());
+	}
+
+	const Object& Object::front()const{
+		assert(type == Type::CONTAINER);
+		return *(std::get<TypeInterface::element<Type::CONTAINER>>(value).front());
+	}
+
+	Object& Object::back(){
+		assert(type == Type::CONTAINER);
+		return *(std::get<TypeInterface::element<Type::CONTAINER>>(value).back());
+	}
+
+	const Object& Object::back()const{
+		assert(type == Type::CONTAINER);
+		return *(std::get<TypeInterface::element<Type::CONTAINER>>(value).back());
+	}
+
+	TypeInterface::element<Type::CONTAINER>::iterator Object::begin()noexcept{
+		assert(type == Type::CONTAINER);
+		return std::get<TypeInterface::element<Type::CONTAINER>>(value).begin();
+	}
+
+	TypeInterface::element<Type::CONTAINER>::const_iterator Object::begin()const noexcept{
+		assert(type == Type::CONTAINER);
+		return std::get<TypeInterface::element<Type::CONTAINER>>(value).begin();
+	}
+
+	TypeInterface::element<Type::CONTAINER>::iterator Object::end()noexcept{
+		assert(type == Type::CONTAINER);
+		return std::get<TypeInterface::element<Type::CONTAINER>>(value).end();
+	}
+
+	TypeInterface::element<Type::CONTAINER>::const_iterator Object::end()const noexcept{
+		assert(type == Type::CONTAINER);
+		return std::get<TypeInterface::element<Type::CONTAINER>>(value).end();
+	}
+
 	std::size_t Object::size()const noexcept{
 		assert(type == Type::CONTAINER);
 		return std::get<TypeInterface::element<Type::CONTAINER>>(value).size();
 	}
 
 	bool Object::operator==(const Object& B)const{
-		return type == B.type && value == B.value;
+		if(type != B.type){
+			return false;
+		}
+		if(type == Type::CONTAINER){
+			if(size() != B.size()){
+				return false;
+			}
+			for(unsigned i = 0; i < size(); i++){
+				if(at(i) != B.at(i)){
+					return false;
+				}
+			}
+			return true;
+		}
+		return value == B.value;
+	}
+
+	bool Object::operator!=(const Object& B)const{
+		return !(*this == B);
 	}
 }

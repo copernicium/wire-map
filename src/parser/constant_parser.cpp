@@ -12,16 +12,12 @@ namespace wiremap::parser{
 		return type;
 	}
 
-	std::optional<std::string> ConstantNode::getValue()const{
-		return value;
-	}
-
-	ConstantNode ConstantNode::parse(const Line& split_line){
-        assert(split_line.size() >= 3);
+	ConstantNode ConstantNode::parse(const Line& LINE){
+        assert(LINE.size() >= 3);
 
         ConstantNode constant_node;
-        constant_node.name = split_line[split_line.size() - 1];
-        constant_node.type = TypeNode::parse(split_line.segment(1, split_line.size() - 1));
+        constant_node.name = LINE[LINE.size() - 1];
+        constant_node.type = TypeNode::parse(LINE.segment(1, LINE.size() - 1));
 
         return constant_node;
     }
@@ -29,8 +25,7 @@ namespace wiremap::parser{
     std::string ConstantNode::toString()const{
         std::string a = "{";
         a += "\"name\":\"" + name + "\", ";
-        a += "\"type\":" + type.toString() + ", ";
-        a += "\"value\":" + (value ? value.value() : "null");
+        a += "\"type\":" + type.toString();
         a += "}";
         return a;
     }
@@ -41,9 +36,9 @@ namespace wiremap::parser{
 
     ConstantNode::ConstantNode(){}
 
-    ConstantNode::ConstantNode(const std::string& NAME, const TypeNode& TYPE, const std::optional<std::string>& V): name(NAME), type(TYPE), value(V){}
+    ConstantNode::ConstantNode(const std::string& NAME, const TypeNode& TYPE): name(NAME), type(TYPE){}
 
     bool operator==(const ConstantNode& a, const ConstantNode& b){
-        return a.getName() == b.getName() && a.getType() == b.getType() && a.getValue() == b.getValue();
+        return a.getName() == b.getName() && a.getType() == b.getType();
     }
 }

@@ -9,36 +9,16 @@
 #include <vector>
 
 #include "map_util.hpp"
-#include "parser/type_parser.hpp"
+#include "object.hpp"
 #include "parser/util.hpp"
 
 namespace wiremap::parser{
+	using Type = wiremap::Type;
+
     struct TypeNode{
-        enum class BaseType{
-            PRIMITIVE,
-            LIST,
-            COLLECTION
-        };
-
-        enum class PrimitiveType{
-            BIT,
-            CHAR,
-            BYTE,
-            WORD,
-            DWORD,
-            QWORD,
-            INTEGER,
-            BOOL,
-            REAL
-        };
-
-        using UnderlyingListType = std::pair<std::shared_ptr<TypeNode>, std::size_t>;
-
-        using UnderlyingCollectionType = std::vector<std::shared_ptr<TypeNode>>;
-
-        using UnderlyingType = std::variant<PrimitiveType, UnderlyingListType, UnderlyingCollectionType>;
-
     private:
+		std::optional<Object> inner;
+
         static constexpr unsigned CONTAINER_KEYWORD_POS = 0;
         static constexpr unsigned CONTAINER_SPECIFIER_POS = 1;
         static constexpr unsigned LIST_SIZE_POS = 2;
@@ -47,34 +27,23 @@ namespace wiremap::parser{
         static constexpr std::string_view CONTAINER_TYPE_SPECIFIER = "of";
 
         static bool isList(const Line&);
-
         static bool isCollection(const Line&);
 
-        BaseType base_type;
-
-        UnderlyingType underlying_type;
-
-        static TypeNode parseObject(const std::string&); // TODO rename to parsePrimitive
+        static TypeNode parsePrimitive(const std::string&);
         static TypeNode parseList(const Line&);
         static TypeNode parseCollection(const Line&);
+
+		TypeNode(const Object&);
+
     public:
-
-        BaseType getBaseType()const;
-
-        PrimitiveType getObjectType()const;
-
-        unsigned getListSize()const;
-
-        TypeNode getListType()const;
-
-        std::vector<TypeNode> getCollectionTypes()const;
+		Object getType()const;
 
         static TypeNode parse(const Line&);
 
         TypeNode();
-        TypeNode(const PrimitiveType&);
-        TypeNode(const UnderlyingListType&);
-        TypeNode(const UnderlyingCollectionType&);
+        TypeNode(const Type&);
+        TypeNode(const TypeNode&, const unsigned&);
+        TypeNode(const std::vector<TypeNode>&);
 
         std::string toString()const;
 
@@ -86,7 +55,7 @@ namespace wiremap::parser{
     bool operator==(const TypeNode&, const TypeNode&);
     bool operator!=(const TypeNode&, const TypeNode&);
 
-    std::string asString(const TypeNode::BaseType&);
+    std::string asString(const Type&);
 
     struct TypeMap{
         static constexpr std::string_view KEYWORD = "as";
@@ -116,7 +85,7 @@ namespace wiremap::parser{
                 "Real"
             };
             for(const auto& a: PRIMITIVES){
-                add(std::string(a),TypeNode::parseObject(std::string(a)));
+                add(std::string(a),TypeNode::parsePrimitive(std::string(a)));
             }
         }
 

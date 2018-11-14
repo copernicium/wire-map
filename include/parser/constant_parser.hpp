@@ -9,8 +9,6 @@ namespace wiremap::parser{
 
         TypeNode type;
 
-        std::optional<std::string> value;
-
         static constexpr std::string_view KEYWORD = "Constant";
 
 	public:
@@ -26,7 +24,7 @@ namespace wiremap::parser{
 
         ConstantNode();
 
-        ConstantNode(const std::string&, const TypeNode&, const std::optional<std::string>&);
+        ConstantNode(const std::string&, const TypeNode&);
 
         std::string toString()const;
     };

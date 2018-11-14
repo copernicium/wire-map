@@ -209,6 +209,28 @@ namespace wiremap{
 
 		const Object& at(const std::size_t&)const;
 
+		Object& operator[](const std::size_t&);
+
+		const Object& operator[](const std::size_t&)const;
+
+		bool empty()const;
+
+		Object& front();
+
+		const Object& front()const;
+
+		Object& back();
+
+		const Object& back()const;
+
+		TypeInterface::element<Type::CONTAINER>::iterator begin()noexcept;
+
+		TypeInterface::element<Type::CONTAINER>::const_iterator begin()const noexcept;
+
+		TypeInterface::element<Type::CONTAINER>::iterator end()noexcept;
+
+		TypeInterface::element<Type::CONTAINER>::const_iterator end()const noexcept;
+
 		std::size_t size()const noexcept;
 
 		// Visit functions
@@ -276,5 +298,7 @@ namespace wiremap{
 		}
 
 		bool operator==(const Object&)const;
+
+		bool operator!=(const Object&)const;
 	};
 }

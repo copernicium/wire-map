@@ -22,13 +22,13 @@ namespace wiremap::parser{
 		return results;
 	}
 
-	int DeviceNode::getParameter(const std::string& NAME)const{
-		for(unsigned i = 0; i < parameters.size(); i++){
-			if(parameters[i].getName() == NAME){
-				return i;
+	bool DeviceNode::isParameter(const std::string& NAME)const{
+		for(const ParameterNode& A: parameters){
+			if(A.getName() == NAME){
+				return true;
 			}
 		}
-		return -1;
+		return false;
 	}
 
 	bool DeviceNode::isConstant(const std::string& NAME)const{

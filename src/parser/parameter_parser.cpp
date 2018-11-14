@@ -12,14 +12,6 @@ namespace wiremap::parser{
 		return type;
 	}
 
-	std::optional<std::string> ParameterNode::getSourceDevice()const{
-		return source_device;
-	}
-
-	std::optional<std::string> ParameterNode::getSourceResult()const{
-		return source_result;
-	}
-
 	bool ParameterNode::identify(const Line& LINE){
 		return LINE.size() >= MIN_DECLARATION_TERMS && LINE.front() == KEYWORD;
 	}
@@ -37,18 +29,16 @@ namespace wiremap::parser{
 	std::string ParameterNode::toString()const{
 		std::string a = "{";
         a += "\"name\":\"" + name + "\", ";
-        a += "\"type\":" + type.toString() + ", ";
-        a += "\"source_device\":" + (source_device ? "\"" + source_device.value() + "\"" : "null") + ", ";
-        a += "\"source_result\":" + (source_result ? "\"" + source_result.value() + "\"" : "null");
+        a += "\"type\":" + type.toString();
         a += "}";
         return a;
     }
 
     ParameterNode::ParameterNode(){}
 
-    ParameterNode::ParameterNode(const std::string& NAME, const TypeNode& TYPE, const std::optional<std::string>& SD, const std::optional<std::string>& SR): name(NAME), type(TYPE), source_device(SD), source_result(SR){}
+    ParameterNode::ParameterNode(const std::string& NAME, const TypeNode& TYPE): name(NAME), type(TYPE){}
 
     bool operator==(const ParameterNode& a, const ParameterNode& b){
-        return a.getName() == b.getName() && a.getType() == b.getType() && a.getSourceDevice() == b.getSourceDevice() && a.getSourceResult() == b.getSourceResult();
+        return a.getName() == b.getName() && a.getType() == b.getType();
     }
 }

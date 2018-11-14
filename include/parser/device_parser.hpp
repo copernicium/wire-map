@@ -27,7 +27,7 @@ namespace wiremap::parser{
 		std::vector<ConstantNode> getConstants()const;
 		std::vector<ResultNode> getResults()const;
 
-		int getParameter(const std::string&)const;
+		bool isParameter(const std::string&)const;
 		bool isConstant(const std::string&)const;
 		bool isResult(const std::string&)const;
 
